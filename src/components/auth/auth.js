@@ -1,7 +1,13 @@
 import { useState } from "react";
+import { connect } from "react-redux";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { authAction, LOGIN_SUCCESS } from "../../actions/authAction";
+import { doLogin } from "../../scripts/auth/authenticate";
 
 const Login = (props) => {
   let [ui_state, set_ui_state] = useState({ checked: "login" });
+  let {auth,dispatch} = props;
+  let history = useHistory()
 
   let name = "";
   let username = "";
@@ -9,19 +15,19 @@ const Login = (props) => {
   let rememberme = true;
 
   let handleName = (e) => {
-    name = e.currentTarget.value;
+    name = e.target.value;
   };
 
   let handleUserName = (e) => {
-    username = e.currentTarget.value;
+    username = e.target.value;
   };
 
   let handlePassword = (e) => {
-    password = e.currentTarget.value;
+    password = e.target.value;
   };
 
   let handleRememberMe = (e) => {
-    rememberme = e.currentTarget.value;
+    rememberme = e.target.value;
   };
 
   let handleRadio = (e, type) => {
@@ -32,8 +38,14 @@ const Login = (props) => {
     console.log();
   };
 
-  let handleLogin = (e) => {
+  let handleLogin = async (e) => {
     e.preventDefault();
+    console.log(username,password)
+    let res = await doLogin()
+    dispatch(authAction(res.type,res.payload))
+    if(res.type === LOGIN_SUCCESS){
+        history.push('/')
+    }
   };
 
   let handleRegister = (e) => {
@@ -170,4 +182,8 @@ const Login = (props) => {
   );
 };
 
-export default Login;
+const mapStateToProps = (state) => ({
+  auth:state.auth
+})
+
+export default connect(mapStateToProps)(Login);
