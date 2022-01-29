@@ -1,0 +1,11 @@
+.notbutton {
+    border: none;
+    background: none;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+}
+
+.bellstyle{
+    color: rgba(255,255,255,.75);
+}

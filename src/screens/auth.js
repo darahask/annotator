@@ -1,99 +1,76 @@
 import { useState } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
-import { authAction, LOGIN_SUCCESS, LOGIN_FAIL, REGISTER_SUCCESS, REGISTER_FAIL } from "../actions/authAction";
+import {
+    authAction,
+    LOGIN_SUCCESS,
+    LOGIN_FAIL,
+    REGISTER_SUCCESS,
+    REGISTER_FAIL,
+} from "../actions/authAction";
 import { doLogin, doRegister } from "../scripts/auth/authenticate";
+import '../styles/login.css'
 
 const Login = (props) => {
-    let [ui_state, set_ui_state] = useState({ checked: "login" });
     let [message, set_message] = useState("");
     let { auth, dispatch } = props;
-    let history = useHistory()
+    let history = useHistory();
 
     let [userDetails, setUserDetails] = useState({
-        'name': '',
-        'username': '',
-        'password': '',
-        'rememberme': false
-    })
+        name: "",
+        username: "",
+        password: "",
+        rememberme: false,
+    });
 
     let handleName = (e) => {
-        setUserDetails({ ...userDetails, 'name': e.target.value });
+        setUserDetails({ ...userDetails, name: e.target.value });
     };
 
     let handleUserName = (e) => {
-        setUserDetails({ ...userDetails, 'username': e.target.value });
+        setUserDetails({ ...userDetails, username: e.target.value });
     };
 
     let handlePassword = (e) => {
-        setUserDetails({ ...userDetails, 'password': e.target.value });
+        setUserDetails({ ...userDetails, password: e.target.value });
     };
 
     let handleRememberMe = (e) => {
-        const { checked } = e.target
-        console.log(checked)
-        setUserDetails({ ...userDetails, 'rememberme': checked });
-    };
-
-    let handleRadio = (e, type) => {
-        set_ui_state({
-            ...ui_state,
-            checked: type,
-        });
-        console.log();
+        const { checked } = e.target;
+        console.log(checked);
+        setUserDetails({ ...userDetails, rememberme: checked });
     };
 
     let handleLogin = async (e) => {
         e.preventDefault();
-        let res = await doLogin({ 'username': userDetails.username, 'password': userDetails.password }, userDetails.rememberme)
-        console.log(res)
-        dispatch(authAction(res.type, res.payload))
+        let res = await doLogin(
+            { username: userDetails.username, password: userDetails.password },
+            userDetails.rememberme
+        );
+        console.log(res);
+        dispatch(authAction(res.type, res.payload));
         if (res.type === LOGIN_SUCCESS) {
-            history.push('/')
+            history.push("/");
         } else if (res.type === LOGIN_FAIL) {
-            set_message("Incorrect username or password")
+            set_message("Incorrect username or password");
         }
     };
 
     let handleRegister = async (e) => {
         e.preventDefault();
-        let res = await doRegister({ 'name': userDetails.name, 'username': userDetails.username, 'password': userDetails.password })
-        console.log(res)
-        dispatch(authAction(res.type, res.payload))
+        let res = await doRegister({
+            name: userDetails.name,
+            username: userDetails.username,
+            password: userDetails.password,
+        });
+        console.log(res);
+        dispatch(authAction(res.type, res.payload));
         if (res.type === REGISTER_SUCCESS) {
-            history.push('/')
+            history.push("/");
         } else if (res.type === REGISTER_FAIL) {
-            set_message("username already taken")
+            set_message("username already taken");
         }
     };
-
-    let Radiogroup = (
-        <div>
-            <input
-                type="radio"
-                className="btn-check m-2"
-                name="options"
-                id="toggle-login"
-                autoComplete="off"
-                onChange={(e) => handleRadio(e, "login")}
-            ></input>
-            <label className="btn btn-primary" htmlFor="toggle-login">
-                Login
-            </label>
-
-            <input
-                type="radio"
-                className="btn-check m-2"
-                name="options"
-                id="toggle-signup"
-                autoComplete="off"
-                onChange={(e) => handleRadio(e, "register")}
-            ></input>
-            <label className="btn btn-primary" htmlFor="toggle-signup">
-                Signup
-            </label>
-        </div>   
-    );
 
     let Formlogin = (
         <form onSubmit={(e) => handleLogin(e)}>
@@ -119,7 +96,7 @@ const Login = (props) => {
                     id="login-password"
                     onChange={(e) => handlePassword(e)}
                     value={userDetails.password}
-                    ></input>
+                ></input>
             </div>
             <div className="mb-3 form-check">
                 <input
@@ -128,7 +105,7 @@ const Login = (props) => {
                     id="login-remember"
                     onChange={(e) => handleRememberMe(e)}
                     defaultChecked={userDetails.rememberme}
-                    ></input>
+                ></input>
                 <label className="form-check-label" htmlFor="login-remember">
                     Remember me
                 </label>
@@ -163,7 +140,7 @@ const Login = (props) => {
                     id="register-username"
                     onChange={(e) => handleUserName(e)}
                     value={userDetails.username}
-                    ></input>
+                ></input>
             </div>
             <div className="mb-3">
                 <label htmlFor="resgister-pass" className="form-label">
@@ -175,7 +152,8 @@ const Login = (props) => {
                     id="resgister-pass"
                     defaultChecked={userDetails.password}
                     onChange={(e) => handlePassword(e)}
-                    ></input>
+                    value={userDetails.password}
+                ></input>
             </div>
             <button type="submit" className="btn btn-primary">
                 Submit
@@ -184,20 +162,63 @@ const Login = (props) => {
     );
 
     return (
-        <div className="container">
-            {Radiogroup}
-
-            { message !== "" ? <div className="alert alert-danger" role="alert">
-                { message }
-            </div> : <div></div> }
-
-            {ui_state.checked === "login" ? Formlogin : Formsignup}
+        <div>
+        <div className="auth-centered">
+            <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                <li className="nav-item" role="presentation">
+                    <button
+                        className="nav-link active"
+                        id="pills-home-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#pills-home"
+                        type="button"
+                        role="tab"
+                        aria-controls="pills-home"
+                        aria-selected="true"
+                    >
+                        Login
+                    </button>
+                </li>
+                <li className="nav-item" role="presentation">
+                    <button
+                        className="nav-link"
+                        id="pills-profile-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#pills-profile"
+                        type="button"
+                        role="tab"
+                        aria-controls="pills-profile"
+                        aria-selected="false"
+                    >
+                        Profile
+                    </button>
+                </li>
+            </ul>
+            <div className="tab-content" id="pills-tabContent">
+                <div
+                    className="tab-pane fade show active"
+                    id="pills-home"
+                    role="tabpanel"
+                    aria-labelledby="pills-home-tab"
+                >
+                    {Formlogin}
+                </div>
+                <div
+                    className="tab-pane fade"
+                    id="pills-profile"
+                    role="tabpanel"
+                    aria-labelledby="pills-profile-tab"
+                >
+                    {Formsignup}
+                </div>
+            </div>
+        </div>
         </div>
     );
 };
 
 const mapStateToProps = (state) => ({
-    auth: state.auth
-})
+    auth: state.auth,
+});
 
 export default connect(mapStateToProps)(Login);
