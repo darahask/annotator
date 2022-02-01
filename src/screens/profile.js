@@ -1,6 +1,8 @@
 import { useState } from "react";
 import profile_photo from './../images/profile_photo.png';
 import profile_photo2 from './../images/profile_photo2.png';
+import profile_photo3 from './../images/profile_photo3.png';
+import profile_photo4 from './../images/profile_photo4.png';
 import './../styles/profile.css';
 
 const Profile = (props) => {
@@ -9,6 +11,7 @@ const Profile = (props) => {
         'username': 'solona',
         'name': 'Solona Westside',
         'description': 'This is Solona Westside from the eastcost river.',
+        'image': null
     })
 
     const [annotatorList, setAnnotatorList] = useState([
@@ -94,6 +97,85 @@ const Profile = (props) => {
         }
     ])
 
+    const usersList = [
+        {
+            'id': 1,
+            'username': 'btc243',
+            'name': 'BTC',
+            'description': 'ksjhvbg'
+        },
+        {
+            'id': 2,
+            'username': 'skjb243',
+            'name': 'DJHV',
+            'description': ''
+        },
+        {
+            'id': 3,
+            'username': 'asdf',
+            'name': 'earg',
+            'description': 'ksjhvbg'
+        },
+        {
+            'id': 4,
+            'username': 'eghf',
+            'name': 'as',
+            'description': 'sefwa'
+        },
+        {
+            'id': 5,
+            'username': 'werwesdf',
+            'name': 'sdf',
+            'description': 'sdgwet'
+        },
+        {
+            'id': 6,
+            'username': 'wertsd',
+            'name': 'w3rwfwd',
+            'description': 'w3r'
+        },
+        {
+            'id': 7,
+            'username': 'dfgdsg',
+            'name': 'sdg',
+            'description': 'awe'
+        },
+        {
+            'id': 8,
+            'username': 'frggds',
+            'name': 'awr',
+            'description': 'wer'
+        }
+    ]
+
+    const [userDisplayList, setUserDisplayList] = useState(usersList)
+
+    const [newRequestDetails, setNewRequestDetails] = useState({
+        'title': '',
+        'description': '',
+        'type': ''
+    })
+
+    const [requestUsernameField, setRequestUsernameField] = useState({
+        'id': null,
+        'username': '',
+        'name': 'null',
+        'description': 'null'
+    })
+
+    const handleProfilePhotoChange = () => {
+        const file = document.querySelector('#updated-profile-photo').files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                setUserInfo({ ...userInfo, 'image': reader.result });
+                document.getElementById("profile-photo").setAttribute("src", reader.result)
+            }
+        }
+        document.getElementById("profile-photo-update-model-close").click();
+    }
+
     const handleAnnotatorDelete = (id) => {
         setAnnotatorList(annotatorList.filter(annotator => annotator.id !== id))
     }
@@ -110,16 +192,105 @@ const Profile = (props) => {
         setReceivedRequests(receivedRequests.map(request => (request.id === id ? { ...request, status: 'declined' } : request)))
     }
 
+    const handleRequestDetails = (e, field) => {
+        if (field === "title") {
+            setNewRequestDetails({ ...newRequestDetails, 'title': e.target.value })
+            document.getElementById('title-invalid').style.display = 'none'
+        }
+        else if (field === "description") {
+            setNewRequestDetails({ ...newRequestDetails, 'description': e.target.value })
+            document.getElementById('description-invalid').style.display = 'none'
+        }
+        else {
+            setNewRequestDetails({ ...newRequestDetails, 'type': e.target.value })
+            document.getElementById('type-invalid').style.display = 'none'
+        }
+
+    }
+
+    const handlerequestUsername = (e) => {
+        setUserDisplayList(usersList.filter(user => {
+            if (user.name.toLowerCase().includes(e.target.value) || user.description.toLowerCase().includes(e.target.value) || user.username.toLowerCase().includes(e.target.value))
+                return user
+        }))
+    }
+
+    const handleUserSelect = (id) => {
+        setRequestUsernameField(usersList.find(user => user.id === id))
+        document.getElementById('username-invalid').style.display = 'none';
+    }
+
+    const handleNewRequestSend = () => {
+        console.log(newRequestDetails)
+        console.log(requestUsernameField)
+        if (newRequestDetails.title === '')
+            document.getElementById('title-invalid').style.display = 'inline'
+        if (newRequestDetails.description === '')
+            document.getElementById('description-invalid').style.display = 'inline'
+        if (newRequestDetails.type === 'DEFAULT')
+            document.getElementById('type-invalid').style.display = 'inline'
+        if (requestUsernameField.id === null)
+            document.getElementById('username-invalid').style.display = 'inline'
+    }
+
+    const handleNewRequestReset = () => {
+        setNewRequestDetails({
+            'title': '',
+            'description': '',
+            'type': ''
+        })
+        setRequestUsernameField({
+            'id': null,
+            'username': '',
+            'name': 'null',
+            'description': 'null'
+        })
+    }
+
+    // document.getElementById('error-modal-open').click()
+    // run above line in case of error
+
     return (
         <div>
+            <div className="modal fade" id="error-modal" tabIndex="-1" aria-labelledby="error-model-label" aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header alert-danger" style={{ border: '1px solid #FF5252' }}>
+                            <button id="error-modal-open" data-bs-toggle="modal" data-bs-target="#error-modal" style={{ visibility: 'hidden' }}></button>
+                            <h6 className="modal-title">Unable to change Profile Photo. Please try again.</h6>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div id="user-details-container">
                 <div className="container">
-                    <div className="row">
-                        <div className="col-md-4 col-sm-12 p-5">
-                            <img src={profile_photo} className="img-fluid rounded" alt="..." />
+                    <div className="row justify-content-center mt-4 mb-4">
+                        <div className="col-md-3 col-sm-12 p-3 parent" style={{ height: '430px' }}>
+                            <div className="child profile-photo-container">
+                                <img id="profile-photo" src={profile_photo} className="rounded child profile-photo" alt="" style={{ height: '80%', width: '100%', objectFit: 'cover' }} />
+                                <button className="profile-photo-edit" data-bs-toggle="modal" data-bs-target="#profilePhotoModel"><i className="fas fa-pen fa-xl"></i></button>
+                                <div className="modal fade" id="profilePhotoModel" tabIndex="-1" aria-labelledby="profilePhotoModelLabel" aria-hidden="true">
+                                    <div className="modal-dialog">
+                                        <div className="modal-content">
+                                            <div className="modal-header">
+                                                <h5 className="modal-title">Select Image</h5>
+                                                <button id="profile-photo-update-model-close" type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div className="modal-body">
+                                                <input type="file" id="updated-profile-photo" name="img" accept="image/*" />
+                                            </div>
+                                            <div className="modal-footer">
+                                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="button" className="btn btn-primary" onClick={handleProfilePhotoChange} data-bs-dismiss>Save changes</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="col-md-8 col-sm-12">
-                            <div className="container p-5">
+                        <div className="col-md-7 col-sm-12">
+                            <div className="p-4">
                                 <div className="d-flex justify-content-end">
                                     {editDetails === true
                                         ? <button type="button" className="btn btn-outline-success" onClick={() => { setEditDetails(false) }}>Save</button>
@@ -132,7 +303,7 @@ const Profile = (props) => {
                                         </div>
                                         <div className="user-field-value">
                                             {editDetails === true
-                                                ? <input type="text" value={userInfo['username']} onChange={(e) => { setUserInfo({ ...userInfo, 'username': e.target.value }) }} />
+                                                ? <input type="text" value={userInfo['username']} onChange={(e) => { setUserInfo({ ...userInfo, 'username': e.target.value }) }} style={{ width: '90%', height: '40px', marginTop: '10px' }} />
                                                 : userInfo['username']}
                                         </div>
                                     </div>
@@ -142,7 +313,7 @@ const Profile = (props) => {
                                         </div>
                                         <div className="user-field-value">
                                             {editDetails === true
-                                                ? <input type="text" value={userInfo['name']} onChange={(e) => { setUserInfo({ ...userInfo, 'name': e.target.value }) }} />
+                                                ? <input type="text" value={userInfo['name']} onChange={(e) => { setUserInfo({ ...userInfo, 'name': e.target.value }) }} style={{ width: '90%', height: '40px', marginTop: '10px' }} />
                                                 : userInfo['name']}
                                         </div>
                                     </div>
@@ -152,7 +323,7 @@ const Profile = (props) => {
                                         </div>
                                         <div className="user-field-value description">
                                             {editDetails === true
-                                                ? <input type="text" value={userInfo['description']} onChange={(e) => { setUserInfo({ ...userInfo, 'description': e.target.value }) }} />
+                                                ? <textarea type="text" value={userInfo['description']} onChange={(e) => { setUserInfo({ ...userInfo, 'description': e.target.value }) }} style={{ width: '90%', height: '90px', marginTop: '10px' }} ></textarea>
                                                 : userInfo['description']}
                                         </div>
                                     </div>
@@ -335,36 +506,74 @@ const Profile = (props) => {
                     </div>
                     <div className="tab-pane fade" id="nav-newrequest" role="tabpanel" aria-labelledby="nav-newrequest-tab">
                         <div className="row request-list-container justify-content-center" style={{ marginTop: '20px' }}>
-                            <div className="col-md-8">
-                                <form className="row g-3 needs-validation" novalidate>
+                            <div className="col-md-7">
+                                <div className="row g-3">
                                     <div className="col-md-12">
                                         <label htmlFor="title" className="form-label">Title</label>
-                                        <input type="text" className="form-control" id="title" required />
+                                        <input type="text" className="form-control" id="title" value={newRequestDetails.title} onChange={(e) => { handleRequestDetails(e, 'title') }} />
+                                        <span id="title-invalid" className="field-invalid">field is required</span>
                                     </div>
                                     <div className="col-md-8">
                                         <label htmlFor="description" className="form-label">Description</label>
-                                        <textarea className="form-control" id="description" style={{ height: '100px' }} required></textarea>
+                                        <textarea className="form-control" id="description" value={newRequestDetails.description} style={{ height: '140px' }} onChange={(e) => { handleRequestDetails(e, 'description') }}></textarea>
+                                        <span id="description-invalid" className="field-invalid">field is required</span>
                                     </div>
                                     <div className="col-md-4">
-                                        <label htmlFor="type" className="form-label" >Type</label>
-                                        <select className="form-select" id="type" defaultValue='DEFAULT' required>
-                                            <option disabled value="DEFAULT">Choose...</option>
-                                            <option value='1'>work</option>
-                                            <option value='2'>hire</option>
-                                        </select>
+                                        <div className="d-grid gap-3">
+                                            <div>
+                                                <label htmlFor="type" className="form-label" >Type</label>
+                                                <select className="form-control" id="type" defaultValue={newRequestDetails.type} onChange={(e) => { handleRequestDetails(e, 'type') }}>
+                                                    <option disabled value=''>Choose...</option>
+                                                    <option value='1'>work</option>
+                                                    <option value='2'>hire</option>
+                                                </select>
+                                                <span id="type-invalid" className="field-invalid">field is required</span>
+                                            </div>
+                                            <div>
+                                                <label htmlFor="username" className="form-label">Username</label>
+                                                <input type="text" className="form-control" id="request-username" value={requestUsernameField.username} disabled aria-describedby="request-username-help" />
+                                                <div id="request-username-help" className="form-text">Select using the users section</div>
+                                                <span id="username-invalid" className="field-invalid">field is required</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="col-md-8">
-                                        <label htmlFor="type" className="form-label" >User</label>
-                                        <select className="form-select" id="type" defaultValue='DEFAULT' required>
-                                            <option disabled value="DEFAULT">Choose...</option>
-                                            <option value='1'>user 1</option>
-                                            <option value='2'>user 2</option>
-                                        </select>
+                                </div>
+                            </div>
+                            <div className="col-md-4">
+                                <div className="container">
+                                    <div className="row justify-content-start search-bar-container">
+                                        <div className="col-2 col-sm-2 col-md-1 search-icon">
+                                            <i className="fas fa-search fa-lg"></i>
+                                        </div>
+                                        <div className="col-10 col-sm-10 col-md-11">
+                                            <div className="row">
+                                                <input type="text" className="search-bar" placeholder="Search User" onChange={(e) => { handlerequestUsername(e) }} />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="col-12">
-                                        <button className="btn btn-primary" type="submit">Submit</button>
+                                    <div className="row border border-top-0 border-dark shadow-lg">
+                                        <div className="search-box-container">
+                                            {userDisplayList.map(user => (
+                                                <div key={user.id} className="search-box-item border rounded shadow-sm" onClick={() => { handleUserSelect(user.id) }}>
+                                                    <div id="name">
+                                                        {user.name}
+                                                    </div>
+                                                    <div id="description">
+                                                        {user.description}
+                                                    </div>
+                                                    <div id="username-container">
+                                                        <span id='username-helpertext'>username:</span>
+                                                        <span id="username">{user.username}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </form>
+                                </div>
+                            </div>
+                            <div className="container p-3">
+                                <button className="btn btn-primary request-send-button" onClick={() => { handleNewRequestSend() }}>Send</button>
+                                <button className="btn btn-danger request-reset-button" onClick={() => { handleNewRequestReset() }}>Reset</button>
                             </div>
                         </div>
                     </div>

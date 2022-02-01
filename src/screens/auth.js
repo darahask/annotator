@@ -190,7 +190,7 @@ const Login = (props) => {
                         aria-controls="pills-profile"
                         aria-selected="false"
                     >
-                        Profile
+                        SignUp
                     </button>
                 </li>
             </ul>

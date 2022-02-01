@@ -7,7 +7,7 @@ import Navnotification from "./Navnotification";
 const Navbar = (props) => {
     let { auth, dispatch } = props;
 
-    useEffect(() => {}, [auth]);
+    useEffect(() => { }, [auth]);
 
     let handleLogout = (e) => {
         e.preventDefault();
@@ -32,7 +32,6 @@ const Navbar = (props) => {
                     <span className="navbar-toggler-icon"></span>
                 </button>
                 <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav ms-auto">
                         {!auth.isAuthenticated ? (
                             <ul className="navbar-nav ms-auto">
                                 <li className="nav-item">
@@ -42,35 +41,35 @@ const Navbar = (props) => {
                                 </li>
                             </ul>
                         ) : (
-                            <ul className="navbar-nav ms-auto">
-                                 <li className="nav-item">
-                                    <Navnotification/>
-                                </li>
-                                <li className="nav-item">
-                                    <Link to="/document" className="nav-link">
-                                        Documents
-                                    </Link>
-                                </li>
-                                <li className="nav-item">
-                                    <Link to="/profile" className="nav-link">
-                                        Profile
-                                    </Link>
-                                </li>
-                                <li className="nav-item">
-                                    <Navnotification/>
-                                </li>
-                                <li className="nav-item">
-                                    <Link
-                                        to="/logout"
-                                        className="nav-link"
-                                        onClick={(e) => handleLogout(e)}
-                                    >
-                                        Login
-                                    </Link>
-                                </li>
-                            </ul>
+                            <>
+                                <ul className="navbar-nav">
+                                    <li className="nav-item">
+                                        <Link to="/document" className="nav-link">
+                                            Documents
+                                        </Link>
+                                    </li>
+                                </ul>
+                                <ul className="navbar-nav ms-auto">
+                                    <li className="nav-item">
+                                        <Navnotification />
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link to="/profile" className="nav-link">
+                                            Profile
+                                        </Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link
+                                            to="/logout"
+                                            className="nav-link"
+                                            onClick={(e) => handleLogout(e)}
+                                        >
+                                            Logout
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </>
                         )}
-                    </ul>
                 </div>
             </div>
         </nav>
