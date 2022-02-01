@@ -8,7 +8,7 @@ import {
     REGISTER_SUCCESS,
     REGISTER_FAIL,
 } from "../actions/authAction";
-import { doLogin, doRegister } from "../scripts/auth/authenticate";
+import { doLogin, doRegister } from "../scripts/authenticate";
 import '../styles/login.css'
 
 const Login = (props) => {

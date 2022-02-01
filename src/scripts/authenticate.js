@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { LOGIN_SUCCESS, LOGIN_FAIL, REGISTER_SUCCESS, REGISTER_FAIL } from '../../actions/authAction'
-import { server } from '../../constants/constant'
+import { LOGIN_SUCCESS, LOGIN_FAIL, REGISTER_SUCCESS, REGISTER_FAIL } from '../actions/authAction'
+import { server } from '../constants/constant'
 
 async function doLogin(userDetails, rememberme) {
     let response = await axios.post(server + 'login', userDetails).catch(function(error) {
@@ -60,4 +60,12 @@ async function doRegister(userDetails) {
     }
 }
 
-export { doLogin, doRegister }
+async function validateToken(token) {
+    let response = await axios.post(server + 'validate-token', {token})
+    if(response.status === 200)
+        return true
+    else
+        return false
+}
+
+export { doLogin, doRegister, validateToken }

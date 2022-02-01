@@ -1,24 +1,60 @@
+import { useEffect } from "react";
+import { connect } from "react-redux";
 import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
+import { authAction, LOGIN_FAIL, LOGIN_SUCCESS } from "../actions/authAction";
 import Navbar from "../components/Navbar";
+import { validateToken } from "../scripts/authenticate";
 import Login from "./auth";
 import Profile from "./profile";
 
 //TODO: connect with store to get auth info
 
 const App = (props) => {
+    useEffect(() => {
+        async function load() {
+            let token = !props.auth.token ? localStorage.getItem("token") : props.auth.token;
+            if(token){
+                let status = await validateToken(token);
+                if (status === true) {
+                    props.dispatch(
+                        authAction(LOGIN_SUCCESS, {
+                            token: token,
+                            isAuthenticated: true,
+                            rememberme: true,
+                            message: null,
+                        })
+                    );
+                } else {
+                    authAction(LOGIN_FAIL, {
+                        message: "Token Expired",
+                    });
+                }
+            }
+        }
+
+        load();
+    }, []);
 
     return (
         <BrowserRouter>
             <div>
-                <Navbar/>
+                <Navbar />
                 <Switch>
-                    <Route path="/profile"><Profile /></Route>
-                    <Route path="/login" ><Login /></Route>
-                    <Route path="/" ><h1 style={{textAlign:"center"}}>Under construction!</h1></Route>
+                    <Route path="/profile">
+                        <Profile />
+                    </Route>
+                    <Route path="/login">
+                        <Login />
+                    </Route>
+                    <Route path="/">
+                        <h1 style={{ textAlign: "center" }}>
+                            Under construction!
+                        </h1>
+                    </Route>
                 </Switch>
             </div>
         </BrowserRouter>
     );
 };
 
-export default App;
+export default connect((state) => ({ auth: state.auth }))(App);

@@ -1,17 +1,20 @@
 import { useEffect } from "react";
 import { connect } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { authAction, LOGOUT } from "../actions/authAction";
 import Navnotification from "./Navnotification";
 
 const Navbar = (props) => {
     let { auth, dispatch } = props;
+    let history = useHistory();
 
     useEffect(() => { }, [auth]);
 
     let handleLogout = (e) => {
         e.preventDefault();
         dispatch(authAction(LOGOUT, {}));
+        history.push('/');
     };
 
     let navbar = (
