@@ -2,16 +2,15 @@ import "./../styles/profile.css";
 
 const ProfileUserList = (props) => {
     const { title, list, handleDelete } = props;
-    console.log(props)
 
     return (
         <div className="col-md-5 list-container">
             <div className="list-title">{title}</div>
             <hr />
             {list.length === 0 ? (
-                <div className="parent">
-                    <div className="child">
-                        <h5 style={{ textAlign: "center" }}>No {title}</h5>
+                <div className="parent" style={{ height: "-webkit-calc(100% - 100px)", width: "100%", textAlign: "center", marginBottom: "15px" }}>
+                    <div className="child description">
+                        You do not have any {title}.
                     </div>
                 </div>
             ) : (

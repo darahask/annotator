@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
+import ProfileRequests from "../components/Profilerequests";
 import ProfileUserList from "../components/Profileuserslist";
 import UserInfo from "../components/Userinfo";
-import { getUserDetails, updateUserDetails } from "../scripts/user";
+import { deleteAnnotator, deleteProject, getUserDetails, updateUserDetails } from "../scripts/user";
 import "./../styles/profile.css";
 
 const Profile = (props) => {
@@ -13,26 +14,9 @@ const Profile = (props) => {
         history.push("/login");
     }
 
-    const [annotatorList, setAnnotatorList] = useState([
-        {
-            id: 1,
-            name: "ETC",
-            description: "This is the description of etc",
-        },
-        {
-            id: 2,
-            name: "Sol",
-            description: "This is the description of sol",
-        },
-    ]);
+    const [annotatorList, setAnnotatorList] = useState([]);
 
-    const [projectList, setProjectList] = useState([
-        {
-            id: 1,
-            name: "Btc",
-            description: "This is the description of btc",
-        },
-    ]);
+    const [projectList, setProjectList] = useState([]);
 
     const [userInfo, setUserInfo] = useState({
         'name': '',
@@ -44,7 +28,6 @@ const Profile = (props) => {
     useEffect(() => {
         async function load() {
             let userDetails = await getUserDetails(props.auth.token);
-            console.log(userDetails)
             setAnnotatorList(userDetails['annotator_list']);
             setProjectList(userDetails['project_list']);
             setUserInfo({
@@ -59,133 +42,11 @@ const Profile = (props) => {
 
     const [errorMessage, setErrorMessage] = useState('');
 
-    const [sentRequests, setSentRequests] = useState([
-        {
-            id: 1,
-            name: "Btc",
-            description: "This is the description of btc",
-            type: "work",
-            status: "pending",
-        },
-        {
-            id: 2,
-            name: "MANA",
-            description: "This is the description of mana",
-            type: "hire",
-            status: "accepted",
-        },
-        {
-            id: 3,
-            name: "Apple",
-            description: "This is the description of apple",
-            type: "work",
-            status: "declined",
-        },
-        {
-            id: 4,
-            name: "Tesla",
-            description: "This is the description of tesla",
-            type: "hire",
-            status: "declined",
-        },
-    ]);
+    const handleErrorMessage = (message) => {
+        setErrorMessage(message);
+        document.getElementById('error-modal-open').click();
 
-    const [receivedRequests, setReceivedRequests] = useState([
-        {
-            id: 1,
-            name: "Btc",
-            description: "This is the description of btc",
-            type: "work",
-            status: "pending",
-        },
-        {
-            id: 2,
-            name: "MANA",
-            description: "This is the description of mana",
-            type: "hire",
-            status: "accepted",
-        },
-        {
-            id: 3,
-            name: "Apple",
-            description: "This is the description of apple",
-            type: "work",
-            status: "pending",
-        },
-        {
-            id: 4,
-            name: "Tesla",
-            description: "This is the description of tesla",
-            type: "hire",
-            status: "declined",
-        },
-    ]);
-
-    const usersList = [
-        {
-            id: 1,
-            username: "btc243",
-            name: "BTC",
-            description: "ksjhvbg",
-        },
-        {
-            id: 2,
-            username: "skjb243",
-            name: "DJHV",
-            description: "",
-        },
-        {
-            id: 3,
-            username: "asdf",
-            name: "earg",
-            description: "ksjhvbg",
-        },
-        {
-            id: 4,
-            username: "eghf",
-            name: "as",
-            description: "sefwa",
-        },
-        {
-            id: 5,
-            username: "werwesdf",
-            name: "sdf",
-            description: "sdgwet",
-        },
-        {
-            id: 6,
-            username: "wertsd",
-            name: "w3rwfwd",
-            description: "w3r",
-        },
-        {
-            id: 7,
-            username: "dfgdsg",
-            name: "sdg",
-            description: "awe",
-        },
-        {
-            id: 8,
-            username: "frggds",
-            name: "awr",
-            description: "wer",
-        },
-    ];
-
-    const [userDisplayList, setUserDisplayList] = useState(usersList);
-
-    const [newRequestDetails, setNewRequestDetails] = useState({
-        title: "",
-        description: "",
-        type: "",
-    });
-
-    const [requestUsernameField, setRequestUsernameField] = useState({
-        id: null,
-        username: "",
-        name: "null",
-        description: "null",
-    });
+    }
 
     const handleProfilePhotoChange = async () => {
         const file = document.querySelector("#updated-profile-photo").files[0];
@@ -207,113 +68,32 @@ const Profile = (props) => {
         let status = await updateUserDetails(props.auth.token, formData)
 
         if(!status) {
-            setErrorMessage("Unable to update Profile Photo. Try again");
-            document.getElementById('error-modal-open').click();
-
+            handleErrorMessage("Profile Photo not set, Try again");
             return ''
         }
 
         return image;
     };
 
-    const handleAnnotatorDelete = (id) => {
-        setAnnotatorList(
-            annotatorList.filter((annotator) => annotator.id !== id)
-        );
-    };
+    const handleAnnotatorDelete = async (id) => {
+        let status = await deleteAnnotator(props.auth.token, id)
 
-    const handleProjectDelete = (id) => {
-        setProjectList(projectList.filter((project) => project.id !== id));
-    };
-
-    const handleAcceptRequest = (id) => {
-        setReceivedRequests(
-            receivedRequests.map((request) =>
-                request.id === id ? { ...request, status: "accepted" } : request
-            )
-        );
-    };
-
-    const handleDeclineRequest = (id) => {
-        setReceivedRequests(
-            receivedRequests.map((request) =>
-                request.id === id ? { ...request, status: "declined" } : request
-            )
-        );
-    };
-
-    const handleRequestDetails = (e, field) => {
-        if (field === "title") {
-            setNewRequestDetails({
-                ...newRequestDetails,
-                title: e.target.value,
-            });
-            document.getElementById("title-invalid").style.display = "none";
-        } else if (field === "description") {
-            setNewRequestDetails({
-                ...newRequestDetails,
-                description: e.target.value,
-            });
-            document.getElementById("description-invalid").style.display =
-                "none";
+        if(status) {
+           setAnnotatorList(annotatorList.filter((annotator) => annotator.id !== id));
         } else {
-            setNewRequestDetails({
-                ...newRequestDetails,
-                type: e.target.value,
-            });
-            document.getElementById("type-invalid").style.display = "none";
+            handleErrorMessage("Cannot delete Annotator, Try again");
         }
-    };
+    }
 
-    const handlerequestUsername = (e) => {
-        setUserDisplayList(
-            usersList.filter((user) => {
-                if (
-                    user.name.toLowerCase().includes(e.target.value) ||
-                    user.description.toLowerCase().includes(e.target.value) ||
-                    user.username.toLowerCase().includes(e.target.value)
-                )
-                    return user;
-            })
-        );
-    };
+    const handleProjectDelete = async (id) => {
+        let status = await deleteProject(props.auth.token, id)
 
-    const handleUserSelect = (id) => {
-        setRequestUsernameField(usersList.find((user) => user.id === id));
-        document.getElementById("username-invalid").style.display = "none";
-    };
-
-    const handleNewRequestSend = () => {
-        console.log(newRequestDetails);
-        console.log(requestUsernameField);
-        if (newRequestDetails.title === "")
-            document.getElementById("title-invalid").style.display = "inline";
-        if (newRequestDetails.description === "")
-            document.getElementById("description-invalid").style.display =
-                "inline";
-        if (newRequestDetails.type === "DEFAULT")
-            document.getElementById("type-invalid").style.display = "inline";
-        if (requestUsernameField.id === null)
-            document.getElementById("username-invalid").style.display =
-                "inline";
-    };
-
-    const handleNewRequestReset = () => {
-        setNewRequestDetails({
-            title: "",
-            description: "",
-            type: "",
-        });
-        setRequestUsernameField({
-            id: null,
-            username: "",
-            name: "null",
-            description: "null",
-        });
-    };
-
-    // document.getElementById('error-modal-open').click()
-    // run above line in case of error
+        if(status) {
+            setProjectList(projectList.filter((project) => project.id !== id));
+        } else {
+            handleErrorMessage("Cannot delete Project, Try again");
+        }
+    }
 
     return (
         <div>
@@ -349,549 +129,16 @@ const Profile = (props) => {
                     </div>
                 </div>
             </div>
-            <UserInfo userInfo={userInfo} setUserInfo={setUserInfo} handleProfilePhotoChange={handleProfilePhotoChange}/>
+            <UserInfo userInfo={userInfo} setUserInfo={setUserInfo} handleProfilePhotoChange={handleProfilePhotoChange} handleErrorMessage={handleErrorMessage}/>
             <div className="list-main-container">
                 <div className="container">
                     <div className="row justify-content-evenly">
-                        <ProfileUserList title="Annotator" list={annotatorList} handleDelete={handleAnnotatorDelete}/>
+                        <ProfileUserList title="Annotators" list={annotatorList} handleDelete={handleAnnotatorDelete}/>
                         <ProfileUserList title="Projects" list={projectList} handleDelete={handleProjectDelete}/>
                     </div>
                 </div>
             </div>
-            <div className="requests container p-3">
-                <nav>
-                    <div
-                        className="nav nav-tabs row"
-                        id="nav-tab"
-                        role="tablist"
-                    >
-                        <button
-                            className="col-4 nav-link active"
-                            id="nav-sentrequests-tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#nav-sentrequests"
-                            type="button"
-                            role="tab"
-                            aria-controls="nav-sentrequests"
-                            aria-selected="true"
-                        >
-                            Sent Requests
-                        </button>
-                        <button
-                            className="col-4 nav-link"
-                            id="nav-receivedrequests-tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#nav-receivedrequests"
-                            type="button"
-                            role="tab"
-                            aria-controls="nav-receivedrequests"
-                            aria-selected="false"
-                        >
-                            Received Requests
-                        </button>
-                        <button
-                            className="col-4 nav-link"
-                            id="nav-newrequest-tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#nav-newrequest"
-                            type="button"
-                            role="tab"
-                            aria-controls="nav-newrequest"
-                            aria-selected="false"
-                        >
-                            New Request
-                        </button>
-                    </div>
-                </nav>
-                <div className="tab-content" id="nav-tabContent">
-                    <div
-                        className="tab-pane fade show active"
-                        id="nav-sentrequests"
-                        role="tabpanel"
-                        aria-labelledby="nav-sentrequests-tab"
-                    >
-                        <div className="row justify-content-center request-list-container">
-                            <div className="col-md-8 list-container">
-                                <div className="d-grid gap-3 list p-3">
-                                    {sentRequests.map((request) => (
-                                        <div
-                                            key={request.id}
-                                            className="shadow-lg p-3 list-item rounded"
-                                            style={
-                                                request.status === "pending"
-                                                    ? {
-                                                          backgroundColor:
-                                                              "#4285F4",
-                                                          color: "white",
-                                                      }
-                                                    : request.status ===
-                                                      "accepted"
-                                                    ? {
-                                                          backgroundColor:
-                                                              "#1DB954",
-                                                          color: "white",
-                                                      }
-                                                    : {
-                                                          backgroundColor:
-                                                              "#ff3333",
-                                                          color: "white",
-                                                      }
-                                            }
-                                        >
-                                            <div className="list-item-title">
-                                                {request.name}
-                                            </div>
-                                            <div className="list-item-description">
-                                                {request.description}
-                                            </div>
-                                            <div className="tag-container">
-                                                <span
-                                                    className="rounded tag"
-                                                    style={
-                                                        request.status ===
-                                                        "pending"
-                                                            ? {
-                                                                  color: "#4285F4",
-                                                              }
-                                                            : request.status ===
-                                                              "accepted"
-                                                            ? {
-                                                                  color: "#1DB954",
-                                                              }
-                                                            : {
-                                                                  color: "#ff3333",
-                                                              }
-                                                    }
-                                                >
-                                                    {request.status}
-                                                </span>
-                                                <span
-                                                    className="rounded tag"
-                                                    style={
-                                                        request.type === "work"
-                                                            ? {
-                                                                  color: "#7c605c",
-                                                              }
-                                                            : {
-                                                                  color: "#b35900",
-                                                              }
-                                                    }
-                                                >
-                                                    {request.type}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        className="tab-pane fade"
-                        id="nav-receivedrequests"
-                        role="tabpanel"
-                        aria-labelledby="nav-receivedrequests-tab"
-                    >
-                        <div className="row justify-content-center request-list-container">
-                            <div className="col-md-8 list-container">
-                                <div className="d-grid gap-3 list p-3">
-                                    {receivedRequests.map((request) =>
-                                        request.status === "pending" ? (
-                                            <div
-                                                key={request.id}
-                                                className="shadow-lg p-3 list-item rounded"
-                                                style={
-                                                    request.status === "pending"
-                                                        ? {
-                                                              backgroundColor:
-                                                                  "#4285F4",
-                                                              color: "white",
-                                                          }
-                                                        : request.status ===
-                                                          "accepted"
-                                                        ? {
-                                                              backgroundColor:
-                                                                  "#1DB954",
-                                                              color: "white",
-                                                          }
-                                                        : {
-                                                              backgroundColor:
-                                                                  "#ff3333",
-                                                              color: "white",
-                                                          }
-                                                }
-                                            >
-                                                <div className="row">
-                                                    <div className="col-10">
-                                                        <div className="list-item-title">
-                                                            {request.name}
-                                                        </div>
-                                                        <div className="list-item-description">
-                                                            {
-                                                                request.description
-                                                            }
-                                                        </div>
-                                                        <div className="tag-container">
-                                                            <span
-                                                                className="rounded tag"
-                                                                style={
-                                                                    request.status ===
-                                                                    "pending"
-                                                                        ? {
-                                                                              color: "#4285F4",
-                                                                          }
-                                                                        : request.status ===
-                                                                          "accepted"
-                                                                        ? {
-                                                                              color: "#1DB954",
-                                                                          }
-                                                                        : {
-                                                                              color: "#ff3333",
-                                                                          }
-                                                                }
-                                                            >
-                                                                {request.status}
-                                                            </span>
-                                                            <span
-                                                                className="rounded tag"
-                                                                style={
-                                                                    request.type ===
-                                                                    "work"
-                                                                        ? {
-                                                                              color: "#7c605c",
-                                                                          }
-                                                                        : {
-                                                                              color: "#b35900",
-                                                                          }
-                                                                }
-                                                            >
-                                                                {request.type}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div
-                                                        className="col-2 delete-icon-container"
-                                                        style={{
-                                                            padding: "0px",
-                                                        }}
-                                                    >
-                                                        <div
-                                                            className="delete-icon"
-                                                            style={{
-                                                                textAlign:
-                                                                    "center",
-                                                                marginTop:
-                                                                    "auto",
-                                                            }}
-                                                        >
-                                                            <div
-                                                                className="shadow rounded accept-button p-2"
-                                                                onClick={() => {
-                                                                    handleAcceptRequest(
-                                                                        request.id
-                                                                    );
-                                                                }}
-                                                            >
-                                                                <i className="fas fa-check fa-lg"></i>
-                                                            </div>
-                                                            <div
-                                                                className="shadow rounded decline-button p-2"
-                                                                onClick={() => {
-                                                                    handleDeclineRequest(
-                                                                        request.id
-                                                                    );
-                                                                }}
-                                                            >
-                                                                <i className="fas fa-times fa-lg"></i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div
-                                                key={request.id}
-                                                className="shadow-lg p-3 list-item rounded"
-                                                style={
-                                                    request.status ===
-                                                    "accepted"
-                                                        ? {
-                                                              backgroundColor:
-                                                                  "#1DB954",
-                                                              color: "white",
-                                                          }
-                                                        : {
-                                                              backgroundColor:
-                                                                  "#ff3333",
-                                                              color: "white",
-                                                          }
-                                                }
-                                            >
-                                                <div className="list-item-title">
-                                                    {request.name}
-                                                </div>
-                                                <div className="list-item-description">
-                                                    {request.description}
-                                                </div>
-                                                <div className="tag-container">
-                                                    <span
-                                                        className="rounded tag"
-                                                        style={
-                                                            request.status ===
-                                                            "pending"
-                                                                ? {
-                                                                      color: "#4285F4",
-                                                                  }
-                                                                : request.status ===
-                                                                  "accepted"
-                                                                ? {
-                                                                      color: "#1DB954",
-                                                                  }
-                                                                : {
-                                                                      color: "#ff3333",
-                                                                  }
-                                                        }
-                                                    >
-                                                        {request.status}
-                                                    </span>
-                                                    <span
-                                                        className="rounded tag"
-                                                        style={
-                                                            request.type ===
-                                                            "work"
-                                                                ? {
-                                                                      color: "#7c605c",
-                                                                  }
-                                                                : {
-                                                                      color: "#b35900",
-                                                                  }
-                                                        }
-                                                    >
-                                                        {request.type}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        )
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        className="tab-pane fade"
-                        id="nav-newrequest"
-                        role="tabpanel"
-                        aria-labelledby="nav-newrequest-tab"
-                    >
-                        <div
-                            className="row request-list-container justify-content-center"
-                            style={{ marginTop: "20px" }}
-                        >
-                            <div className="col-md-7">
-                                <div className="row g-3">
-                                    <div className="col-md-12">
-                                        <label
-                                            htmlFor="title"
-                                            className="form-label"
-                                        >
-                                            Title
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="title"
-                                            value={newRequestDetails.title}
-                                            onChange={(e) => {
-                                                handleRequestDetails(
-                                                    e,
-                                                    "title"
-                                                );
-                                            }}
-                                        />
-                                        <span
-                                            id="title-invalid"
-                                            className="field-invalid"
-                                        >
-                                            field is required
-                                        </span>
-                                    </div>
-                                    <div className="col-md-8">
-                                        <label
-                                            htmlFor="description"
-                                            className="form-label"
-                                        >
-                                            Description
-                                        </label>
-                                        <textarea
-                                            className="form-control"
-                                            id="description"
-                                            value={
-                                                newRequestDetails.description
-                                            }
-                                            style={{ height: "140px" }}
-                                            onChange={(e) => {
-                                                handleRequestDetails(
-                                                    e,
-                                                    "description"
-                                                );
-                                            }}
-                                        ></textarea>
-                                        <span
-                                            id="description-invalid"
-                                            className="field-invalid"
-                                        >
-                                            field is required
-                                        </span>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="d-grid gap-3">
-                                            <div>
-                                                <label
-                                                    htmlFor="type"
-                                                    className="form-label"
-                                                >
-                                                    Type
-                                                </label>
-                                                <select
-                                                    className="form-control"
-                                                    id="type"
-                                                    defaultValue={
-                                                        newRequestDetails.type
-                                                    }
-                                                    onChange={(e) => {
-                                                        handleRequestDetails(
-                                                            e,
-                                                            "type"
-                                                        );
-                                                    }}
-                                                >
-                                                    <option disabled value="">
-                                                        Choose...
-                                                    </option>
-                                                    <option value="1">
-                                                        work
-                                                    </option>
-                                                    <option value="2">
-                                                        hire
-                                                    </option>
-                                                </select>
-                                                <span
-                                                    id="type-invalid"
-                                                    className="field-invalid"
-                                                >
-                                                    field is required
-                                                </span>
-                                            </div>
-                                            <div>
-                                                <label
-                                                    htmlFor="username"
-                                                    className="form-label"
-                                                >
-                                                    Username
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    id="request-username"
-                                                    value={
-                                                        requestUsernameField.username
-                                                    }
-                                                    disabled
-                                                    aria-describedby="request-username-help"
-                                                />
-                                                <div
-                                                    id="request-username-help"
-                                                    className="form-text"
-                                                >
-                                                    Select using the users
-                                                    section
-                                                </div>
-                                                <span
-                                                    id="username-invalid"
-                                                    className="field-invalid"
-                                                >
-                                                    field is required
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-md-4">
-                                <div className="container">
-                                    <div className="row justify-content-start search-bar-container">
-                                        <div className="col-2 col-sm-2 col-md-1 search-icon">
-                                            <i className="fas fa-search fa-lg"></i>
-                                        </div>
-                                        <div className="col-10 col-sm-10 col-md-11">
-                                            <div className="row">
-                                                <input
-                                                    type="text"
-                                                    className="search-bar"
-                                                    placeholder="Search User"
-                                                    onChange={(e) => {
-                                                        handlerequestUsername(
-                                                            e
-                                                        );
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="row border border-top-0 border-dark shadow-lg">
-                                        <div className="search-box-container">
-                                            {userDisplayList.map((user) => (
-                                                <div
-                                                    key={user.id}
-                                                    className="search-box-item border rounded shadow-sm"
-                                                    onClick={() => {
-                                                        handleUserSelect(
-                                                            user.id
-                                                        );
-                                                    }}
-                                                >
-                                                    <div id="name">
-                                                        {user.name}
-                                                    </div>
-                                                    <div id="description">
-                                                        {user.description}
-                                                    </div>
-                                                    <div id="username-container">
-                                                        <span id="username-helpertext">
-                                                            username:
-                                                        </span>
-                                                        <span id="username">
-                                                            {user.username}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="container p-3">
-                                <button
-                                    className="btn btn-primary request-send-button"
-                                    onClick={() => {
-                                        handleNewRequestSend();
-                                    }}
-                                >
-                                    Send
-                                </button>
-                                <button
-                                    className="btn btn-danger request-reset-button"
-                                    onClick={() => {
-                                        handleNewRequestReset();
-                                    }}
-                                >
-                                    Reset
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <ProfileRequests handleErrorMessage={handleErrorMessage}/>
         </div>
     );
 };

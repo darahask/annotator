@@ -1,11 +1,42 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import profile_photo from "./../images/profilePlaceHolder.png";
+import { updateUserDetails } from "../scripts/user";
+import {connect} from "react-redux";
 
 const UserInfo = (props) => {
+    
+
     const [editDetails, setEditDetails] = useState(false);
     let userInfo = props.userInfo;
     let setUserInfo = props.setUserInfo;
+    const [tempUserInfo, setTempUserInfo] = useState({});
+
+    useEffect(() => {
+        setTempUserInfo({
+            'name': userInfo.name,
+            'description': userInfo.description
+        });
+    }, [userInfo]);
+    
     const handleProfilePhotoChange = props.handleProfilePhotoChange;
+    const handleErrorMessage = props.handleErrorMessage;
+
+    const handleOnSave = async () => {
+        let status = await updateUserDetails(props.auth.token, {
+            'name': tempUserInfo.name,
+            'description': tempUserInfo.description
+        })
+        if(status){
+            setUserInfo({ ...userInfo, 'name': tempUserInfo.name, 'description': tempUserInfo.description });
+        }
+        else {
+            handleErrorMessage("User Details not set, Try again");
+            setTempUserInfo({
+                'name': userInfo.name,
+                'description': userInfo.description
+            });
+        }
+    }
 
     return (
         <div id="user-details-container">
@@ -18,7 +49,7 @@ const UserInfo = (props) => {
                         <div className="child profile-photo-container">
                             <img
                                 id="profile-photo"
-                                src={ userInfo.image === '' ? profile_photo : userInfo.image }
+                                src={ userInfo.image === 'data:image/png;base64, ' ? profile_photo : userInfo.image }
                                 className="rounded child profile-photo"
                                 alt=""
                                 style={{
@@ -99,6 +130,7 @@ const UserInfo = (props) => {
                                         className="btn btn-outline-success"
                                         onClick={() => {
                                             setEditDetails(false);
+                                            handleOnSave();
                                         }}
                                     >
                                         Save
@@ -121,26 +153,7 @@ const UserInfo = (props) => {
                                         Username
                                     </div>
                                     <div className="user-field-value">
-                                        {editDetails === true ? (
-                                            <input
-                                                type="text"
-                                                value={userInfo["username"]}
-                                                onChange={(e) => {
-                                                    setUserInfo({
-                                                        ...userInfo,
-                                                        username:
-                                                            e.target.value,
-                                                    });
-                                                }}
-                                                style={{
-                                                    width: "90%",
-                                                    height: "40px",
-                                                    marginTop: "10px",
-                                                }}
-                                            />
-                                        ) : (
-                                            userInfo["username"]
-                                        )}
+                                        { userInfo["username"] }
                                     </div>
                                 </div>
                                 <div className="p-2">
@@ -149,10 +162,10 @@ const UserInfo = (props) => {
                                         {editDetails === true ? (
                                             <input
                                                 type="text"
-                                                value={userInfo["name"]}
+                                                value={tempUserInfo["name"]}
                                                 onChange={(e) => {
-                                                    setUserInfo({
-                                                        ...userInfo,
+                                                    setTempUserInfo({
+                                                        ...tempUserInfo,
                                                         name: e.target.value,
                                                     });
                                                 }}
@@ -171,14 +184,14 @@ const UserInfo = (props) => {
                                     <div className="user-field-title">
                                         Description
                                     </div>
-                                    <div className="user-field-value description">
+                                    <div className={"user-field-value description" + ((!editDetails && userInfo["description"] === "") ? ' blank-description' : '')}>
                                         {editDetails === true ? (
                                             <textarea
                                                 type="text"
-                                                value={userInfo["description"]}
+                                                value={tempUserInfo["description"]}
                                                 onChange={(e) => {
-                                                    setUserInfo({
-                                                        ...userInfo,
+                                                    setTempUserInfo({
+                                                        ...tempUserInfo,
                                                         description:
                                                             e.target.value,
                                                     });
@@ -204,4 +217,4 @@ const UserInfo = (props) => {
 };
 
 
-export default UserInfo;
+export default connect((state) => ({ auth: state.auth }))(UserInfo);

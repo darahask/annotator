@@ -45,7 +45,7 @@ async function doRegister(userDetails) {
         }
     })
 
-    console.log(response)
+    console.log('register response', response)
 
     if (response.status === 200) {
         return {

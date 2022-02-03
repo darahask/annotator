@@ -14,7 +14,7 @@
     top: 50px;
     right: 10px;
     border-radius: 50%;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.6);    
 }
 
 .user-field-title {
@@ -31,6 +31,12 @@
     color: #494949;
 }
 
+.blank-description {
+    height: 30px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid black;
+}
+
 .edit-icon {
     padding-left: 20px;
     font-size: 16px;
@@ -45,6 +51,7 @@
 
 .list-container {
     background-color: white;
+    margin-top: 10px;
 }
 
 .list-title {
@@ -52,6 +59,7 @@
     font-weight: bolder;
     padding-top: 20px;
     padding-left: 5px;
+    text-align: center;
 }
 
 .list-item-title {
@@ -94,8 +102,20 @@
 }
 
 .request-list-container {
-    height: 450px;
+    max-height: 450px;
     overflow: auto;
+}
+
+.requests-navbar button {
+    background-color: #FF6500 !important;
+    color: white;
+    font-size: 16px;
+    font-weight: bolder;
+}
+
+.active .nav-button {
+    background-color: white !important;
+    color: #FF6500;
 }
 
 .tag {
