@@ -5,6 +5,7 @@ import { authAction, LOGIN_FAIL, LOGIN_SUCCESS } from "../actions/authAction";
 import Navbar from "../components/Navbar";
 import { validateToken } from "../scripts/authenticate";
 import Login from "./auth";
+import Document from "./Document";
 import Profile from "./profile";
 
 //TODO: connect with store to get auth info
@@ -45,6 +46,9 @@ const App = (props) => {
                     </Route>
                     <Route path="/login">
                         <Login />
+                    </Route>
+                    <Route path="/document">
+                        <Document />
                     </Route>
                     <Route path="/">
                         <h1 style={{ textAlign: "center" }}>

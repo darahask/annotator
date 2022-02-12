@@ -195,7 +195,7 @@
     cursor: pointer;
 }
 
-.search-box-item #name {
+.search-box-item .name {
     font-size: 16px;
     font-weight: bold;
     max-height: 25px;
@@ -203,7 +203,7 @@
     overflow: hidden;
 }
 
-.search-box-item #description {
+.search-box-item .description {
     font-size: 14px;
     color: rgba(0, 0, 0, 0.486);
     max-height: 20px;
@@ -211,18 +211,18 @@
     overflow: hidden;
 }
 
-.search-box-item #username-container {
+.search-box-item .username-container {
     max-height: 25px;
     word-break: break-all;
     overflow: hidden;
 }
 
-.search-box-item #username-helpertext {
+.search-box-item .username-helpertext {
     font-size: 14px;
     font-weight: bold;
 }
 
-.search-box-item #username {
+.search-box-item .username {
     font-size: 14px;
     padding-left: 10px;
 }
