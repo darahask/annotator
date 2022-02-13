@@ -7,6 +7,7 @@ import { validateToken } from "../scripts/authenticate";
 import Login from "./auth";
 import Document from "./Document";
 import Profile from "./profile";
+import SearchBar from '../components/Searchbar'
 
 //TODO: connect with store to get auth info
 
@@ -53,6 +54,7 @@ const App = (props) => {
                     <Route path="/">
                         <h1 style={{ textAlign: "center" }}>
                             Under construction!
+                            <SearchBar />
                         </h1>
                     </Route>
                 </Switch>
