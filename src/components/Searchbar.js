@@ -4,7 +4,7 @@ import { Input } from 'semantic-ui-react'
 import { server } from "../constants/constant";
 import { connect } from "react-redux";
 import "../styles/documentCard.scss"
-
+import "../styles/searchBar.scss"
 
 function Card(props) {
     return (
@@ -62,12 +62,21 @@ let SearchBar = (props) => {
 
     return (
         <div>
-            <div className="searchBar">
+            {/* <div className="searchBar">
                 <Input icon='search'
                         placeholder='Search...'
                         onChange={(e) => searchItems(e.target.value)}
                 />
+            </div> */}
+            <div>
+
+                <div className="container">
+                    <input type="text" placeholder="Search..." onChange={(e) => searchItems(e.target.value)}/>
+                    <div className="search"></div>
+                </div>
+
             </div>
+
             <div className='wrapper'>
                 
                 
