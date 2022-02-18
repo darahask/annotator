@@ -33,6 +33,7 @@ async function doLogin(userDetails, rememberme) {
 }
 
 async function doRegister(userDetails) {
+    console.log(userDetails)
     let response = await axios.post(server + 'register', userDetails).catch(function(error) {
         if (error.response) {
             console.log(error.response.data);
