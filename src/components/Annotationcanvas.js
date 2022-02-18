@@ -11,10 +11,9 @@ const Annotationcanvas = () => {
         var tempShape = {};
         var isDragging = false;
 
-        canvas.style.border = "1px solid black";
-
         let image = new Image();
-        image.src = "https://cdn.pixabay.com/photo/2021/08/18/18/17/office-6556228_1280.png";
+        image.src =
+            "https://cdn.pixabay.com/photo/2021/08/18/18/17/office-6556228_1280.png";
         image.onload = () => {
             canvas.width = image.width;
             canvas.height = image.height;
@@ -179,11 +178,17 @@ const Annotationcanvas = () => {
                 <button>Delete </button>
                 <button id="pop-close">Close</button>
             </div>
-            <div id="Div1" style={{ float: "left", width: "100%", height: "800px", overflow:"scroll"}}>
-                {/* <canvas id="myCanvas1" width="200" style="border:1px solid #ff0000;">
-                    asdf asd as asfqwe asd asdfasdf asd as asfqwe asd asdfasdf asd as asfqwe asd asdf
-                </canvas> */}
-            <canvas ref={ref} ></canvas>
+            <div
+                style={{
+                    float: "left",
+                    width: "100%",
+                    height: "800px",
+                    overflow: "scroll",
+                    border: "2px solid black",
+                    margin: "15px",
+                }}
+            >
+                <canvas ref={ref}></canvas>
             </div>
         </>
     );
