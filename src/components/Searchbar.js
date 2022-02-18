@@ -70,7 +70,7 @@ let SearchBar = (props) => {
             </div> */}
             <div>
 
-                <div className="container">
+                <div className="cont">
                     <input type="text" placeholder="Search..." onChange={(e) => searchItems(e.target.value)}/>
                     <div className="search"></div>
                 </div>
