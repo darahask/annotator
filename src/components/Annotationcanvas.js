@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import '../styles/popup.css'
+import "../styles/popup.css";
 
 const Annotationcanvas = () => {
     let ref = useRef();
@@ -11,11 +11,10 @@ const Annotationcanvas = () => {
         var tempShape = {};
         var isDragging = false;
 
-        canvas.style.border = "1px solid red";
+        canvas.style.border = "1px solid black";
 
         let image = new Image();
-        image.src =
-            "https://cdn.pixabay.com/photo/2021/08/18/18/17/office-6556228_1280.png";
+        image.src = "https://cdn.pixabay.com/photo/2021/08/18/18/17/office-6556228_1280.png";
         image.onload = () => {
             canvas.width = image.width;
             canvas.height = image.height;
@@ -69,7 +68,7 @@ const Annotationcanvas = () => {
             console.log("click: " + e.offsetX + "/" + e.offsetY);
             var rect = collides(shapes, e.offsetX, e.offsetY);
             if (rect) {
-                launchPopup(rect, offsetX, offsetY)
+                launchPopup(rect, offsetX, offsetY);
             } else {
                 console.log("no collision");
             }
@@ -79,6 +78,7 @@ const Annotationcanvas = () => {
             e.preventDefault();
             e.stopPropagation();
 
+            reOffset();
             tempShape.x = parseInt(e.clientX - offsetX);
             tempShape.y = parseInt(e.clientY - offsetY);
             tempShape.type = "rectangle";
@@ -87,6 +87,7 @@ const Annotationcanvas = () => {
         }
 
         function handleMouseUp(e) {
+            reOffset();
             // return if we're not dragging
             if (!isDragging) {
                 return;
@@ -101,6 +102,7 @@ const Annotationcanvas = () => {
         }
 
         function handleMouseOut(e) {
+            reOffset();
             // return if we're not dragging
             if (!isDragging) {
                 return;
@@ -115,6 +117,7 @@ const Annotationcanvas = () => {
         }
 
         function handleMouseMove(e) {
+            reOffset();
             if (!isDragging) {
                 return;
             }
@@ -134,19 +137,18 @@ const Annotationcanvas = () => {
             tempShape.height = dy;
         }
 
-        let popup = document.getElementById('pop')
-        document.getElementById('pop-close').onclick = (e)=>{
-            e.preventDefault()
-            popup.style.top = 0
-            popup.style.left = 0
-            popup.style.display = "none"
-        }
+        let popup = document.getElementById("pop");
+        document.getElementById("pop-close").onclick = (e) => {
+            e.preventDefault();
+            popup.style.top = 0;
+            popup.style.left = 0;
+            popup.style.display = "none";
+        };
 
-        function launchPopup(shape, offx, offy){
-            popup.style.display = "block"
-            popup.style.top = offy + shape.y + shape.height +"px"
-            popup.style.left = offx + shape.x + shape.width + "px"
-            
+        function launchPopup(shape, offx, offy) {
+            popup.style.display = "block";
+            popup.style.top = offy + shape.y + shape.height + "px";
+            popup.style.left = offx + shape.x + shape.width + "px";
         }
 
         function drawAll() {
@@ -175,9 +177,14 @@ const Annotationcanvas = () => {
                 <br></br>
                 <button>Save </button>
                 <button>Delete </button>
-                <button id='pop-close'>Close</button>
+                <button id="pop-close">Close</button>
             </div>
-            <canvas ref={ref}></canvas>
+            <div id="Div1" style={{ float: "left", width: "100%", height: "800px", overflow:"scroll"}}>
+                {/* <canvas id="myCanvas1" width="200" style="border:1px solid #ff0000;">
+                    asdf asd as asfqwe asd asdfasdf asd as asfqwe asd asdfasdf asd as asfqwe asd asdf
+                </canvas> */}
+            <canvas ref={ref} ></canvas>
+            </div>
         </>
     );
 };
