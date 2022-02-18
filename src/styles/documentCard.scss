@@ -16,18 +16,18 @@ $clr-gray700: #161d34;
 /*   border radius */
 $radius: 0.2rem;
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+// *,
+// *::before,
+// *::after {
+//   box-sizing: border-box;
+//   margin: 0;
+//   padding: 0;
+// }
 
-body {
-  font-family: Oxygen, sans-serif;
-  margin: 2rem;
-}
+// body {
+//   font-family: Oxygen, sans-serif;
+//   margin: 2rem;
+// }
 
 .wrapper {
   display: grid;
