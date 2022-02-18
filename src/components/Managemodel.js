@@ -2,6 +2,8 @@ import { connect } from "react-redux";
 import "./../styles/profile.css";
 import "./../styles/managemodel.css";
 import { useState } from "react";
+import { socketConnect, trainModel } from "../scripts/document";
+import { useEffect } from "react";
 
 const Managemodel = (props) => {
     const [modelpoolList, setModelpoolList] = useState([
@@ -59,6 +61,10 @@ const Managemodel = (props) => {
         pool_models: [],
     });
 
+    const [trainingProgressMessage, setTPM] = useState("");
+    const [trainingProgressPercentage, setTPP] = useState(0);
+    const [trainModelMessage, setTMM] = useState("");
+
     const handleModelpoolsSearch = (e) => {
         setDisplayedModelPools(
             modelpoolList.filter((modelpool) => {
@@ -88,6 +94,74 @@ const Managemodel = (props) => {
         document.getElementById("modal-toggle").click();
     };
 
+    const handleSocketConnect = () => {
+        var socket = new WebSocket("ws://127.0.0.1:8000/ws/1/");
+        socket.onmessage = (e) => {
+            var data = JSON.parse(e.data);
+            console.log(data)
+            setTPM(data.message);
+            setTPP(data.percentage);
+        };
+        socket.onclose = () => {
+            console.log('socket closed')
+            setTPM('Something went wrong. Try again');
+            setTPP(0);
+        };
+    }
+
+    useEffect(() => {
+        // var socket = new WebSocket("ws://127.0.0.1:8000/ws/1/");
+        // socket.onmessage = (e) => {
+        //     var data = JSON.parse(e.data);
+        //     console.log(data)
+        //     setTPM(data.message);
+        //     setTPP(data.percentage);
+        // };
+        // socket.onclose = () => {
+        //     console.log('socket closed')
+        //     setTPM('Something went wrong. Try again');
+        //     setTPP(0);
+        // };
+        // console.log(socket)
+    }, [])
+
+    const handleModelTrain = async () => {
+        setTPM('');
+        setTPP(0);
+        var p=0
+        for(var i=0;i<10000000000;i++) {
+            p += 1
+        }
+        console.log(p);
+
+        var model_name = document.getElementById("modelname-input").value;
+        if (model_name.split(" ").join("") === "") {
+            setTMM("field required");
+        } else {
+            setTMM("");
+
+            
+
+            model_name = model_name.split(" ").join(" ");
+            let response = await trainModel(props.auth.token, model_name, 1);
+            if(response) {
+                console.log(response)
+                if(response.status === 200) {
+                    setTPM('model successfully trained');
+                    setTPP(100);
+                } else {
+                    setTMM(response.data.message)
+                    setTPM('Something went wrong. Try again');
+                    setTPP(0);
+                }
+            } else {
+                setTMM("Training failed. Try again")
+                setTPM('Something went wrong. Try again');
+                setTPP(0);
+            }
+        }
+    };
+
     return (
         <div className="container">
             <nav>
@@ -106,22 +180,22 @@ const Managemodel = (props) => {
                         <div className="row justify-content-center progress-container">
                             <div className="col-8 col-md-7">
                                 <div className="progress" style={{ height: "30px" }}>
-                                    <div className="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style={{ width: "75%" }}>
-                                        75%
+                                    <div className="progress-bar progress-bar-striped progress-bar-animated " role="progressbar" aria-valuenow={trainingProgressPercentage} aria-valuemin="0" aria-valuemax="100" style={{ width: trainingProgressPercentage.toString() + "%"  }}>
+                                        {trainingProgressPercentage}%
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-8 col-md-7" style={{ fontSize: "14px", color: "dimgrey", paddingTop: "5px" }}>
-                                Model started training
+                            <div id="progress-msg" className="col-8 col-md-7" style={{ fontSize: "14px", color: "dimgrey", paddingTop: "5px" }}>
+                                {trainingProgressMessage}
                             </div>
                         </div>
                         <div className="row justify-content-center">
                             <div className="col-8 col-md-6">
                                 <input id="modelname-input" placeholder="Enter model name" maxLength={24} />
-                                <div className="modelinput-errormsg">No Patterns Found</div>
+                                <div className="modelinput-errormsg">{trainModelMessage}</div>
                             </div>
                             <div className="col-4 col-md-2" style={{ textAlign: "center" }}>
-                                <button id="train-button" className="">
+                                <button id="train-button" onClick={() => {handleSocketConnect(); handleModelTrain();}}>
                                     Train
                                 </button>
                             </div>
