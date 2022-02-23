@@ -23,7 +23,11 @@ const SideNavbar = (props) => {
         <div>
             <div class="offcanvas offcanvas-start w-25" tabindex="-1" id="offcanvas" data-bs-keyboard="false" data-bs-backdrop="false">
             <div class="offcanvas-header">
-                <h6 class="offcanvas-title d-none d-sm-block" id="offcanvas">Menu</h6>
+                <h1 class="offcanvas-title d-none d-sm-block" id="offcanvas">
+                    <Link to='/'>
+                        Akshara
+                    </Link>
+                </h1>
                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body px-0">
