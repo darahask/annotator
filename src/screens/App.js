@@ -54,8 +54,11 @@ const App = (props) => {
                     <Route path="/">
                         <h1 style={{ textAlign: "center", marginTop: "10px" }}>
                             Under construction!
-                            <SearchBar />
+                            
                         </h1>
+                        <div>
+                            <SearchBar />
+                        </div>
                     </Route>
                 </Switch>
             </div>
