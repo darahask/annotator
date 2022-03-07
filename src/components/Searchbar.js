@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Input, Loader } from 'semantic-ui-react'
 import { server } from "../constants/constant";
@@ -28,6 +28,7 @@ let SearchBar = (props) => {
     const [searchInput, setSearchInput] = useState('');
     const [loaderComponent, showLoader, hideLoader] = useFullPageLoader();
 
+
     useEffect(() => {
         console.log("Inside use effect")
         showLoader();
@@ -46,19 +47,25 @@ let SearchBar = (props) => {
                 console.log(response.data)
                 hideLoader();
                 setAPIData(response.data);
-
             })
     }, [])
 
+    let combineData = (name,description) => {
+        return name + " " + description
+    }
+
     const searchItems = (searchValue) => {
         showLoader();
-        setSearchInput(searchValue)
-        if (searchInput !== '') {
-            const filteredData = APIData.filter((item) => {
-                return Object.values(item).join('').toLowerCase().includes(searchInput.toLowerCase())
+        setSearchInput(searchValue);
+        if (searchValue.length > 0) {
+            
+            let filteredData = APIData.filter((item) => {
+                let mergedString = combineData(item['name'],item['description'])
+                return mergedString.toLowerCase().includes(searchValue.toLowerCase())
             })
+
             hideLoader();
-            setFilteredResults(filteredData)
+            setFilteredResults(filteredData);
         }
         else{
             hideLoader();
