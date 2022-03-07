@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Input } from 'semantic-ui-react'
+import { Input, Loader } from 'semantic-ui-react'
 import { server } from "../constants/constant";
 import { connect } from "react-redux";
+import useFullPageLoader from "../hooks/useFullPageLoader";
 import "../styles/documentCard.scss"
 import "../styles/searchBar.scss"
 import { useHistory } from "react-router-dom";
@@ -26,10 +27,15 @@ let SearchBar = (props) => {
     const [APIData, setAPIData] = useState([])
     const [filteredResults, setFilteredResults] = useState([]);
     const [searchInput, setSearchInput] = useState('');
+<<<<<<< HEAD
     let history = useHistory()
+=======
+    const [loaderComponent, showLoader, hideLoader] = useFullPageLoader();
+>>>>>>> eb648bf8e82720bd51677c3d08aa06d1f692fa17
 
     useEffect(() => {
         console.log("Inside use effect")
+        showLoader();
         axios.get(server+"user-document-list",
         {
             headers: {
@@ -43,20 +49,24 @@ let SearchBar = (props) => {
                 }
 
                 console.log(response.data)
-                
+                hideLoader();
                 setAPIData(response.data);
+
             })
     }, [])
 
     const searchItems = (searchValue) => {
+        showLoader();
         setSearchInput(searchValue)
         if (searchInput !== '') {
             const filteredData = APIData.filter((item) => {
                 return Object.values(item).join('').toLowerCase().includes(searchInput.toLowerCase())
             })
+            hideLoader();
             setFilteredResults(filteredData)
         }
         else{
+            hideLoader();
             setFilteredResults(APIData)
         }
     }
@@ -67,12 +77,6 @@ let SearchBar = (props) => {
 
     return (
         <div>
-            {/* <div className="searchBar">
-                <Input icon='search'
-                        placeholder='Search...'
-                        onChange={(e) => searchItems(e.target.value)}
-                />
-            </div> */}
             <div>
 
                 <div className="cont">
@@ -81,11 +85,10 @@ let SearchBar = (props) => {
                 </div>
 
             </div>
-
+            {loaderComponent}
             <div className='wrapper'>
                 
-                
-                    {searchInput.length > 1 ? (
+                    {searchInput.length >= 1 ? (
                         filteredResults.map((item) => {
                             return (
                                 <Card
