@@ -1,7 +1,6 @@
 import { connect } from "react-redux";
 import Managemodel from "../components/Managemodel";
 import Annotationcanvas from "../components/Annotationcanvas";
-<<<<<<< HEAD
 import { useHistory } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useParams } from "react-router-dom";
@@ -14,6 +13,7 @@ const Document = (props) => {
     let location = useLocation();
     const { id } = useParams();
     const [document, setDocument] = useState({});
+    const [annotations, setAnnotations] = useState([])
 
     if (!props.auth.token) {
         history.push("/login");
@@ -35,27 +35,15 @@ const Document = (props) => {
         }
         load()
     },[]);
-=======
-import Annotationlist from "../components/Annotationlist";
-import { useState } from "react";
-
-const Document = (props) => {
-
-    const [annotations, setAnnotations] = useState([])
->>>>>>> eb648bf8e82720bd51677c3d08aa06d1f692fa17
 
     return (
         <div>
             <div className="row justify-content-around">
                 <div className="col-md-8">
-<<<<<<< HEAD
-                    <Annotationcanvas document={document} />
-=======
                     <Annotationcanvas data={{annotations,setAnnotations}} />
                 </div>
                 <div className="col-md-3">
                     <Annotationlist data={{annotations,setAnnotations}}/>
->>>>>>> eb648bf8e82720bd51677c3d08aa06d1f692fa17
                 </div>
             </div>
             <Managemodel />
