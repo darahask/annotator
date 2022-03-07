@@ -1,11 +1,13 @@
 import { useEffect, useRef } from "react";
 import "../styles/popup.css";
 
-const Annotationcanvas = ({ data }) => {
+const Annotationcanvas = ({data}) => {
     let ref = useRef();
     let { annotations, setAnnotations } = data;
 
     useEffect(() => {
+        
+
         let canvas = ref.current;
         let ctx = canvas.getContext("2d");
         var shapes = annotations;
@@ -195,7 +197,7 @@ const Annotationcanvas = ({ data }) => {
             popname.value = shape.name ?? "";
             popcheck.checked = shape.isAntiPattern ?? false
         }
-    }, []);
+    }, [props.document]);
 
     return (
         <div>

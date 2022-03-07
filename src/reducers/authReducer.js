@@ -4,7 +4,7 @@ import {
     LOGOUT,
     REGISTER_SUCCESS,
     REGISTER_FAIL,
-} from "../../actions/authAction";
+} from "./../actions/authAction";
 
 const token = sessionStorage.getItem('token');
 const initialState = {
