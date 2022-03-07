@@ -48,13 +48,16 @@ const App = (props) => {
                     <Route path="/login">
                         <Login />
                     </Route>
-                    <Route path="/document">
-                        <Document/>
+                    <Route exact path="/documents">
+                        <SearchBar />
                     </Route>
+                    <Route exact path="/documents/:id">
+                        <Document />
+                    </Route>
+                    {/* <Route exact path="/documents/:id" render={(props)=> <Document id={props.match.params.id} />} /> */}
                     <Route path="/">
                         <h1 style={{ textAlign: "center", marginTop: "10px" }}>
                             Under construction!
-                            <SearchBar />
                         </h1>
                     </Route>
                 </Switch>

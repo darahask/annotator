@@ -5,12 +5,13 @@ import { server } from "../constants/constant";
 import { connect } from "react-redux";
 import "../styles/documentCard.scss"
 import "../styles/searchBar.scss"
+import { useHistory } from "react-router-dom";
 
 function Card(props) {
     return (
-      <div className="card">
+      <div className="card" onClick={() => props.handleDocumentClick(props.id)}>
         <div className="card__body">
-          <img src={props.img} class="card__image" />
+          <img src={props.img} className="card__image" />
           <h2 className="card__title">{props.title}</h2>
           <p className="card__description">{props.description}</p>
         </div>
@@ -25,6 +26,8 @@ let SearchBar = (props) => {
     const [APIData, setAPIData] = useState([])
     const [filteredResults, setFilteredResults] = useState([]);
     const [searchInput, setSearchInput] = useState('');
+    let history = useHistory()
+
     useEffect(() => {
         console.log("Inside use effect")
         axios.get(server+"user-document-list",
@@ -36,7 +39,7 @@ let SearchBar = (props) => {
                 
                 //for now, but will be changed later
                 for(let idx=0;idx<response.data.length;idx++){
-                    response.data[idx]["image"] = "https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ";
+                    response.data[idx]["image"] = response.data[idx]["image"];
                 }
 
                 console.log(response.data)
@@ -58,7 +61,9 @@ let SearchBar = (props) => {
         }
     }
 
-    
+    const handleDocumentClick = (id) => {
+        history.push(`/documents/${id}`, APIData.find((item) => item.id === id));
+    }
 
     return (
         <div>
@@ -84,10 +89,12 @@ let SearchBar = (props) => {
                         filteredResults.map((item) => {
                             return (
                                 <Card
+                                    id = {item.id}
                                     img = {item.image}
                                     title = {item.name}
                                     description = {item.description}
                                     key = {item.id}
+                                    handleDocumentClick = {handleDocumentClick}
                                 >
                                 </Card>
                             )
@@ -96,10 +103,12 @@ let SearchBar = (props) => {
                         APIData.map((item) => {
                             return (
                                 <Card
+                                    id = {item.id}
                                     img = {item.image}
                                     title = {item.name}
                                     description = {item.description}
                                     key = {item.id}
+                                    handleDocumentClick = {handleDocumentClick}
                                 >
                                 </Card>
                             )

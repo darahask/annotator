@@ -206,9 +206,9 @@ const ProfileRequests = (props) => {
                                 </div>
                             ) : (
                                 <div className="d-grid gap-3 list p-3">
-                                    {sentRequests.map((request) => (
+                                    {sentRequests.map((request, index) => (
                                         <div
-                                            key={request.id}
+                                            key={index}
                                             className="shadow-lg p-3 list-item rounded"
                                             style={
                                                 request.status === "pending"
@@ -279,10 +279,10 @@ const ProfileRequests = (props) => {
                                 </div>
                             ) : (
                                 <div className="d-grid gap-3 list p-3">
-                                    {receivedRequests.map((request) =>
+                                    {receivedRequests.map((request, index) =>
                                         request.status === "pending" ? (
                                             <div
-                                                key={request.id}
+                                                key={index}
                                                 className="shadow-lg p-3 list-item rounded"
                                                 style={
                                                     request.status === "pending"
@@ -375,7 +375,7 @@ const ProfileRequests = (props) => {
                                             </div>
                                         ) : (
                                             <div
-                                                key={request.id}
+                                                key={index}
                                                 className="shadow-lg p-3 list-item rounded"
                                                 style={
                                                     request.status === "accepted"
@@ -532,9 +532,9 @@ const ProfileRequests = (props) => {
                                 </div>
                                 <div className="row border border-top-0 border-dark shadow-lg">
                                     <div className="search-box-container">
-                                        {userDisplayList.map((user) => (
+                                        {userDisplayList.map((user,index) => (
                                             <div
-                                                key={user.id}
+                                                key={index}
                                                 className="search-box-item border rounded shadow-sm"
                                                 onClick={() => {
                                                     handleUserSelect(user.id);

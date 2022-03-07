@@ -15,9 +15,9 @@ const ProfileUserList = (props) => {
                 </div>
             ) : (
                 <div className="d-grid gap-3 list p-3">
-                    {list.map((user) => (
+                    {list.map((user,index) => (
                         <div
-                            key={user.id}
+                            key={index}
                             className="shadow-sm p-2 list-item rounded"
                         >
                             <div className="row p-2">

@@ -1,10 +1,12 @@
 import { useEffect, useRef } from "react";
 import "../styles/popup.css";
 
-const Annotationcanvas = () => {
+const Annotationcanvas = (props) => {
     let ref = useRef();
 
     useEffect(() => {
+        
+
         let canvas = ref.current;
         let ctx = canvas.getContext("2d");
         var shapes = [];
@@ -12,8 +14,7 @@ const Annotationcanvas = () => {
         var isDragging = false;
 
         let image = new Image();
-        image.src =
-            "https://cdn.pixabay.com/photo/2021/08/18/18/17/office-6556228_1280.png";
+        image.src = props.document["image"];
         image.onload = () => {
             canvas.width = image.width;
             canvas.height = image.height;
@@ -164,7 +165,7 @@ const Annotationcanvas = () => {
                 }
             }
         }
-    }, []);
+    }, [props.document]);
 
     return (
         <>
