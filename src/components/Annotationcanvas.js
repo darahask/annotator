@@ -197,7 +197,7 @@ const Annotationcanvas = ({data}) => {
             popname.value = shape.name ?? "";
             popcheck.checked = shape.isAntiPattern ?? false
         }
-    }, [props.document]);
+    }, [annotations, setAnnotations]);
 
     return (
         <div>

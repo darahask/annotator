@@ -47,6 +47,7 @@ const Login = (props) => {
             { username: userDetails.username, password: userDetails.password },
             userDetails.rememberme
         );
+        console.log("inside auth.js file");
         console.log(res);
         dispatch(authAction(res.type, res.payload));
         if (res.type === LOGIN_SUCCESS) {
@@ -63,6 +64,7 @@ const Login = (props) => {
             username: userDetails.username,
             password: userDetails.password,
         });
+        
         console.log(res);
         dispatch(authAction(res.type, res.payload));
         if (res.type === REGISTER_SUCCESS) {

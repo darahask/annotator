@@ -27,16 +27,14 @@ let SearchBar = (props) => {
     const [APIData, setAPIData] = useState([])
     const [filteredResults, setFilteredResults] = useState([]);
     const [searchInput, setSearchInput] = useState('');
-<<<<<<< HEAD
     let history = useHistory()
-=======
     const [loaderComponent, showLoader, hideLoader] = useFullPageLoader();
->>>>>>> eb648bf8e82720bd51677c3d08aa06d1f692fa17
 
 
     useEffect(() => {
         console.log("Inside use effect")
         showLoader();
+        console.log(props);
         axios.get(server+"user-document-list",
         {
             headers: {
@@ -52,6 +50,8 @@ let SearchBar = (props) => {
                 console.log(response.data)
                 hideLoader();
                 setAPIData(response.data);
+            }).catch(()=>{
+                hideLoader();
             })
     }, [])
 
