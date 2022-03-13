@@ -7,6 +7,7 @@ import Navnotification from "./Navnotification";
 import CreateProjectButton from "./CreateProjectButton";
 import { Item } from "semantic-ui-react";
 import { fetchAllDocumentsOfAProject } from '../scripts/project';
+import { fetchAllAnnotationsOfAParticularProject } from "../scripts/annotation";
 
 const SideNavbar = (props) => {
     let { auth, dispatch, projectList } = props;
@@ -19,16 +20,26 @@ const SideNavbar = (props) => {
     //     history.push('/');
     // };
 
-    let fetchAllDocumentsOfAParticularProject = async (project)=>{
+    let fetchAllDocumentsAndAnnotationsOfAParticularProject = async (project)=>{
         //we need to fetch all documents which belongs to a relevant project using project id
-        let res = await fetchAllDocumentsOfAProject(
+        let allDocumentsResponse = await fetchAllDocumentsOfAProject(
             {
                 project:project._id
             },
             auth.token
         );
 
-        console.log(res);
+        let allAnnotationsResponse = await fetchAllAnnotationsOfAParticularProject(
+            {
+                project:project._id
+            },
+            auth.token
+        ) 
+
+        console.log("ALL DOCUMENTS RESPONSE");
+        console.log(allDocumentsResponse);
+        console.log("ALL ANNOTATIONS RESPONSE");
+        console.log(allAnnotationsResponse);
 
     }
 
@@ -74,7 +85,7 @@ const SideNavbar = (props) => {
                                     return (
                                         <div>
                                             <Link 
-                                                onClick={() => fetchAllDocumentsOfAParticularProject(project)}
+                                                onClick={() => fetchAllDocumentsAndAnnotationsOfAParticularProject(project)}
                                                 key={project._id}
                                                 value={project}
                                             >

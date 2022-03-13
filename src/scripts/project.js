@@ -55,11 +55,11 @@ async function fetchAllDocumentsOfAProject(projectId,authToken) {
         console.log(error);
         return {
             data:{
-                "project-list": []
+                "documents": []
             }
         }
     })
-    console.log("response from get-project-list route");
+    console.log("response from document-list route");
     console.log(response);
 
     return response;
