@@ -17,16 +17,21 @@ const CreateProjectButton = (props) => {
         description:""
     });
 
-    console.log("inside CreateProjectButton Component");
-    console.log(props);
+    useEffect(() => { 
+        setNewProjectDetails({
+            ...newProjectDetails,
+            title:"",
+            description:""
+        });
+    }, [auth]);
 
-    useEffect(() => { }, [auth]);
-
-    let handleLogout = (e) => {
-        e.preventDefault();
-        dispatch(authAction(LOGOUT, {}));
-        history.push('/');
-    };
+    let handleInputState = () => {
+        setNewProjectDetails({
+            ...newProjectDetails,
+            title:"",
+            description:""
+        });
+    }
 
     let handleCreationOfProject = async (e) => {
         e.preventDefault();
@@ -50,11 +55,10 @@ const CreateProjectButton = (props) => {
         setNewProjectDetails({ ...newProjectDetails, description:e.target.value});
     }
 
-
-
+    
     let createProjectButton = (
         <div>
-            <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">New Project</button>
+            <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo" onClick={handleInputState}>New Project</button>
 
             <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div className="modal-dialog">
@@ -86,8 +90,8 @@ const CreateProjectButton = (props) => {
                             </div>
 
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Create Project</button>
+                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" >Close</button>
+                                <button type="submit" className="btn btn-primary" data-bs-dismiss="modal" >Create Project</button>
                             </div>
 
                         </form>

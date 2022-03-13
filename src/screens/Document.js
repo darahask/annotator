@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { useState } from "react";
 import { getDocument } from "../scripts/document";
+import Annotationlist from "../components/Annotationlist";
 
 const Document = (props) => {
     let history = useHistory();

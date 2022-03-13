@@ -35,24 +35,25 @@ let SearchBar = (props) => {
         console.log("Inside use effect")
         showLoader();
         console.log(props);
-        axios.get(server+"user-document-list",
-        {
-            headers: {
-                authtoken: props.auth.token,
-            }
-        }).then((response) => {
+        // axios.get(server+"document-list",
+        // {
+        //     headers: {
+        //         authtoken: props.auth.token,
+        //     }
+        // }).then((response) => {
                 
-                //for now, but will be changed later
-                for(let idx=0;idx<response.data.length;idx++){
-                    response.data[idx]["image"] = response.data[idx]["image"];
-                }
+        //         //for now, but will be changed later
+        //         for(let idx=0;idx<response.data.length;idx++){
+        //             response.data[idx]["image"] = response.data[idx]["image"];
+        //         }
 
-                console.log(response.data)
-                hideLoader();
-                setAPIData(response.data);
-            }).catch(()=>{
-                hideLoader();
-            })
+        //         console.log(response.data)
+        //         hideLoader();
+        //         setAPIData(response.data);
+        //     }).catch(()=>{
+        //         console.log("catch statement")
+        //         hideLoader();
+        //     })
     }, [])
 
     let combineData = (name,description) => {

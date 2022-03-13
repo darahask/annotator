@@ -5,21 +5,32 @@ import { Link } from "react-router-dom";
 import { authAction, LOGOUT } from "../actions/authAction";
 import Navnotification from "./Navnotification";
 import CreateProjectButton from "./CreateProjectButton";
-// import "../styles/sideNavBar.css";
-
+import { Item } from "semantic-ui-react";
+import { fetchAllDocumentsOfAProject } from '../scripts/project';
 
 const SideNavbar = (props) => {
-    let { auth, dispatch } = props;
+    let { auth, dispatch, projectList } = props;
     let history = useHistory();
-    console.log("inside SideNavbar Component");
-    console.log(props);
     useEffect(() => { }, [auth]);
 
-    let handleLogout = (e) => {
-        e.preventDefault();
-        dispatch(authAction(LOGOUT, {}));
-        history.push('/');
-    };
+    // let handleLogout = (e) => {
+    //     e.preventDefault();
+    //     dispatch(authAction(LOGOUT, {}));
+    //     history.push('/');
+    // };
+
+    let fetchAllDocumentsOfAParticularProject = async (project)=>{
+        //we need to fetch all documents which belongs to a relevant project using project id
+        let res = await fetchAllDocumentsOfAProject(
+            {
+                project:project._id
+            },
+            auth.token
+        );
+
+        console.log(res);
+
+    }
 
     let sideNavbar = (
         <div>
@@ -58,9 +69,24 @@ const SideNavbar = (props) => {
                             <li><a className="dropdown-item" href="#">Settings</a></li>
                             <li><a className="dropdown-item" href="#">Profile</a></li>
                             <li><a className="dropdown-item" href="#">Sign out</a></li>  */}
-                            <li><a className="dropdown-item" href="#">projectName1</a></li>
+                            {
+                                projectList['project-list'].map((project)=>{
+                                    return (
+                                        <div>
+                                            <Link 
+                                                onClick={() => fetchAllDocumentsOfAParticularProject(project)}
+                                                key={project._id}
+                                                value={project}
+                                            >
+                                                {project.title}
+                                            </Link>
+                                        </div>
+                                    )
+                                })
+                            }
+                            {/* <li><a className="dropdown-item" href="#">projectName1</a></li>
                             <li><a className="dropdown-item" href="#">projectName2</a></li>
-                            <li><a className="dropdown-item" href="#">projectName3</a></li>
+                            <li><a className="dropdown-item" href="#">projectName3</a></li> */}
                         </ul>
                     </li>
                     {/* <li>

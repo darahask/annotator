@@ -1,16 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { authAction, LOGOUT } from "../actions/authAction";
 import Navnotification from "./Navnotification";
 import SideNavbar from "./SideNavbar";
+import { doGetListOfProjectsOfaParticularUser } from '../scripts/project';
 
 const Navbar = (props) => {
     let { auth, dispatch } = props;
     let history = useHistory();
+    let [currentUserAllProjectsList, setCurrentUserAllProjectsList] = useState({
+        "project-list":[]
+    });
 
-    useEffect(() => { }, [auth]);
+    useEffect(() => {}, [auth]);
 
     let handleLogout = (e) => {
         e.preventDefault();
@@ -20,9 +24,21 @@ const Navbar = (props) => {
         history.push('/');
     };
 
+    let handleSideNavbarRendering = async () => {
+        console.log("handleSideNavbarRendering");
+
+        let res = await doGetListOfProjectsOfaParticularUser(auth.token);
+
+        setCurrentUserAllProjectsList({
+            ...currentUserAllProjectsList,
+            "project-list":res.data["project-list"]
+        });
+
+    }
+
     let navbar = (
         <div>
-            <SideNavbar />
+            <SideNavbar projectList={currentUserAllProjectsList}/>
             <nav className="navbar-expand-lg navbar navbar-dark bg-dark">
                 <div className="container-fluid">
                     {/* <button
@@ -98,7 +114,7 @@ const Navbar = (props) => {
             </nav>
 
             <div>
-                <button className="btn float-end" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
+                <button className="btn float-end" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button" onClick={handleSideNavbarRendering}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-right-square-fill" viewBox="0 0 16 16">
                     <path d="M0 14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v12zm4.5-6.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5a.5.5 0 0 1 0-1z"/>
                 </svg>

@@ -22,4 +22,48 @@ async function doCreateProject(projectDetails,authToken) {
 
 }
 
-export { doCreateProject };
+async function doGetListOfProjectsOfaParticularUser(authToken) {
+    console.log(authToken)
+    let response = await axios.get(server + 'get-project-list',{
+        headers: {
+            authtoken: authToken
+        },
+    })
+    .catch(function(error) {
+        console.log(error);
+        return {
+            data:{
+                "project-list": []
+            }
+        }
+    })
+    console.log("response from get-project-list route");
+    console.log(response);
+
+    return response;
+
+}
+
+async function fetchAllDocumentsOfAProject(projectId,authToken) {
+    console.log(authToken)
+    let response = await axios.post(server + 'document-list',projectId,{
+        headers: {
+            authtoken: authToken
+        },
+    })
+    .catch(function(error) {
+        console.log(error);
+        return {
+            data:{
+                "project-list": []
+            }
+        }
+    })
+    console.log("response from get-project-list route");
+    console.log(response);
+
+    return response;
+
+}
+
+export { doCreateProject , doGetListOfProjectsOfaParticularUser, fetchAllDocumentsOfAProject};
