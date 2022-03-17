@@ -1,10 +1,8 @@
 import { useEffect } from "react";
 
 const Annotationlist = ({ data }) => {
-    let { annotations } = data;
+    let { annotations, setAnnotations } = data;
     let objmap = new Map();
-
-    console.log("In annolist", annotations);
     useEffect(() => {}, [annotations]);
 
     for (var i = 0; i < annotations.length; i++) {
@@ -15,44 +13,35 @@ const Annotationlist = ({ data }) => {
             annocategory === null ||
             annocategory === "undefined"
         ) {
-            objmap.set(anno.name, [anno.name]);
+            objmap.set(anno.name, [anno]);
         } else {
-            objmap.set([...annocategory, anno.name]);
+            objmap.set(anno.name,[...annocategory, anno]);
         }
+    }
+
+    function disableAnnotations(e, index){
+        setAnnotations(annotations.map((value)=>{
+            if(value.name === index){
+                return {
+                    ...value,
+                    visible: e.target.checked
+                }
+            }
+            return value;
+        }))
     }
 
     function getUi() {
         let components = [];
         objmap.forEach((value, index) => {
             let c = (
-                <div className="accordion mb-2" key={index}>
-                    <div className="accordion-item">
-                        <h2
-                            className="accordion-header"
-                            id={`panelsStayOpen-heading${index}`}
-                        >
-                            <button
-                                className="accordion-button"
-                                type="button"
-                                data-bs-toggle="collapse"
-                                data-bs-target={`#panelsStayOpen-collapse${index}`}
-                                aria-expanded="true"
-                                aria-controls={`panelsStayOpen-collapse${index}`}
-                            >
-                                {index}
-                            </button>
-                        </h2>
-                        <div
-                            id={`panelsStayOpen-collapse${index}`}
-                            className="accordion-collapse collapse show"
-                            aria-labelledby={`panelsStayOpen-heading${index}`}
-                        >
-                            <div className="accordion-body">
-                                {value.map((anno, i) => {
-                                    return <i key={i}>{anno}</i>;
-                                })}
-                            </div>
-                        </div>
+                <div style={{marginTop:"8px", border:"1px dashed black", padding:"6px"}} key={index}>
+                    <input type="checkbox" style={{ display: "inline" }} onChange={(e) => {disableAnnotations(e,index)}} checked={value[0].visible}></input>
+                    <div style={{ display: "inline", marginLeft: "15px" }}>
+                        <strong>{"Name: " + index}</strong>
+                    </div>
+                    <div >
+                        <i>{"Count: " + value.length.toString()}</i>
                     </div>
                 </div>
             );
@@ -61,10 +50,12 @@ const Annotationlist = ({ data }) => {
         return components;
     }
 
-    return <div className="mt-3 p-3" style={{border:"1px solid black"}}>
-        <h3>Annotations</h3>
-        {getUi()}
-        </div>;
+    return (
+        <div className="mt-3 p-3" style={{ border: "1px solid black" }}>
+            <h3>Annotations</h3>
+            {getUi()}
+        </div>
+    );
 };
 
 export default Annotationlist;

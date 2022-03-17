@@ -1,22 +1,37 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { authAction, LOGOUT } from "../actions/authAction";
 import Navnotification from "./Navnotification";
-import SideNavbar from "./SideNavbar";
 
 const Navbar = (props) => {
     let { auth, dispatch } = props;
     let history = useHistory();
+    // let [currentUserAllProjectsList, setCurrentUserAllProjectsList] = useState({
+    //     "project-list":[]
+    // });
 
-    useEffect(() => { }, [auth]);
+    useEffect(() => {}, [auth]);
 
     let handleLogout = (e) => {
         e.preventDefault();
         dispatch(authAction(LOGOUT, {}));
+
         history.push('/');
     };
+
+    // let handleSideNavbarRendering = async () => {
+    //     console.log("handleSideNavbarRendering");
+
+    //     let res = await doGetListOfProjectsOfaParticularUser(auth.token);
+
+    //     setCurrentUserAllProjectsList({
+    //         ...currentUserAllProjectsList,
+    //         "project-list":res.data["project-list"]
+    //     });
+
+    // }
 
     let navbar = (
         <div>

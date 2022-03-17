@@ -133,6 +133,10 @@ let SearchBar = (props) => {
     //         })
     // }, [])
 
+    let combineData = (name,description) => {
+        return name + " " + description
+    }
+
     const searchItems = (searchValue) => {
         showLoader();
         setSearchInput(searchValue);

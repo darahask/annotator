@@ -1,18 +1,16 @@
 import { useEffect, useRef } from "react";
 import "../styles/popup.css";
 
-const Annotationcanvas = ({data}) => {
+const Annotationcanvas = ({ data }) => {
     let ref = useRef();
     let { annotations, setAnnotations } = data;
 
     useEffect(() => {
-        
-
         let canvas = ref.current;
         let ctx = canvas.getContext("2d");
-        var shapes = annotations;
-        var tempShape = {};
-        var isDragging = false;
+        let shapes = [...annotations];
+        let tempShape = {};
+        let isDragging = false;
 
         let image = new Image();
         image.src =
@@ -21,9 +19,10 @@ const Annotationcanvas = ({data}) => {
             canvas.width = image.width;
             canvas.height = image.height;
             ctx.drawImage(image, 0, 0);
-            shapes.push({
+            shapes.unshift({
                 img: image,
                 type: "image",
+                visible: true,
             });
             drawAll();
         };
@@ -47,11 +46,18 @@ const Annotationcanvas = ({data}) => {
             ctx.clearRect(0, 0, cw, ch);
             for (var i = 0; i < shapes.length; i++) {
                 var shape = shapes[i];
-                if (shape.type === "image") {
-                    ctx.drawImage(shape.img, 0, 0);
-                } else {
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+                if (shape.visible) {
+                    if (shape.type === "image") {
+                        ctx.drawImage(shape.img, 0, 0);
+                    } else {
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(
+                            shape.x,
+                            shape.y,
+                            shape.width,
+                            shape.height
+                        );
+                    }
                 }
             }
         }
@@ -73,12 +79,9 @@ const Annotationcanvas = ({data}) => {
         }
 
         canvas.addEventListener("click", (e) => {
-            console.log("click: " + e.offsetX + "/" + e.offsetY);
             var rect = collides(e.offsetX, e.offsetY);
             if (rect) {
                 launchPopup(rect, offsetX, offsetY);
-            } else {
-                console.log("no collision");
             }
         });
 
@@ -90,36 +93,36 @@ const Annotationcanvas = ({data}) => {
             tempShape.x = parseInt(e.clientX - offsetX);
             tempShape.y = parseInt(e.clientY - offsetY);
             tempShape.type = "rectangle";
+            tempShape.visible = true;
 
             isDragging = true;
         }
 
         function handleMouseUp(e) {
             reOffset();
-            // return if we're not dragging
             if (!isDragging) {
                 return;
             }
-            // tell the browser we're handling this event
+
             e.preventDefault();
             e.stopPropagation();
-            // the drag is over -- clear the isDragging flag
-            if(tempShape.width || tempShape.height)shapes.push(tempShape);
+
+            if (tempShape.width && tempShape.height) shapes.push(tempShape);
             tempShape = {};
             isDragging = false;
         }
 
         function handleMouseOut(e) {
             reOffset();
-            // return if we're not dragging
+
             if (!isDragging) {
                 return;
             }
-            // tell the browser we're handling this event
+
             e.preventDefault();
             e.stopPropagation();
-            // the drag is over -- clear the isDragging flag
-            if(tempShape.width || tempShape.height)shapes.push(tempShape);
+
+            if (tempShape.width && tempShape.height) shapes.push(tempShape);
             tempShape = {};
             isDragging = false;
         }
@@ -153,7 +156,7 @@ const Annotationcanvas = ({data}) => {
 
         popname.onchange = (e) => {
             e.preventDefault();
-            shapes[selectedRectangle].name = e.target.value;
+            shapes[selectedRectangle].name = e.target.value ?? "No name";
         };
 
         popcheck.onclick = (e) => {
@@ -163,7 +166,7 @@ const Annotationcanvas = ({data}) => {
         document.getElementById("pop-save").onclick = (e) => {
             e.preventDefault();
             let lannotations = shapes.filter((shape) => {
-                return (shape.type === "rectangle")? true : false;
+                return shape.type === "rectangle" && shape.name ? true : false;
             });
             setAnnotations(lannotations);
             popup.style.display = "none";
@@ -174,7 +177,7 @@ const Annotationcanvas = ({data}) => {
             shapes.splice(selectedRectangle, 1);
             drawAll();
             let lannotations = shapes.filter((shape) => {
-                return (shape.type === "rectangle")? true : false;
+                return shape.type === "rectangle" ? true : false;
             });
             setAnnotations(lannotations);
             popup.style.display = "none";
@@ -193,9 +196,8 @@ const Annotationcanvas = ({data}) => {
             popup.style.display = "block";
             popup.style.top = offy + shape.y + shape.height + "px";
             popup.style.left = offx + shape.x + shape.width + "px";
-            console.log(shapes.name,shape.isAntiPattern)
             popname.value = shape.name ?? "";
-            popcheck.checked = shape.isAntiPattern ?? false
+            popcheck.checked = shape.isAntiPattern ?? false;
         }
     }, [annotations]);
 
@@ -204,13 +206,14 @@ const Annotationcanvas = ({data}) => {
             <div id="pop" className="canvas-popup">
                 <div className="mb-3">
                     <label htmlFor="pop-name" className="form-label">
-                        Email address
+                        Name
                     </label>
                     <input
-                        type="email"
+                        type="text"
                         className="form-control"
                         id="pop-name"
                         aria-describedby="emailHelp"
+                        required
                     ></input>
                 </div>
                 <div className="mb-3 form-check">
@@ -223,7 +226,7 @@ const Annotationcanvas = ({data}) => {
                         Mark as anti-pattern
                     </label>
                 </div>
-                <button id="pop-save" className="btn btn-success">
+                <button type="submit" id="pop-save" className="btn btn-success">
                     Save
                 </button>
                 <button id="pop-delete" className="btn btn-danger">
