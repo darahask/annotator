@@ -2,21 +2,16 @@ import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
 import ProfileRequests from "../components/Profilerequests";
-import ProfileUserList from "../components/Profileuserslist";
 import UserInfo from "../components/Userinfo";
-import { deleteAnnotator, deleteProject, getUserDetails, updateUserDetails } from "../scripts/user";
+import { getUserDetails, updateUserDetails } from "../scripts/user";
 import "./../styles/profile.css";
 
-const Profile = (props) => {
+const Userprofile = (props) => {
     let history = useHistory();
 
     if (!props.auth.token) {
         history.push("/login");
     }
-
-    const [annotatorList, setAnnotatorList] = useState([]);
-
-    const [projectList, setProjectList] = useState([]);
 
     const [userInfo, setUserInfo] = useState({
         name: "",
@@ -28,8 +23,6 @@ const Profile = (props) => {
     useEffect(() => {
         async function load() {
             let userDetails = await getUserDetails(props.auth.token);
-            setAnnotatorList(userDetails["annotator_list"]);
-            setProjectList(userDetails["project_list"]);
             setUserInfo({
                 name: userDetails["name"],
                 description: userDetails["description"],
@@ -72,26 +65,6 @@ const Profile = (props) => {
         return image;
     };
 
-    const handleAnnotatorDelete = async (id) => {
-        let status = await deleteAnnotator(props.auth.token, id);
-
-        if (status) {
-            setAnnotatorList(annotatorList.filter((annotator) => annotator.id !== id));
-        } else {
-            handleErrorMessage("Cannot delete Annotator, Try again");
-        }
-    };
-
-    const handleProjectDelete = async (id) => {
-        let status = await deleteProject(props.auth.token, id);
-
-        if (status) {
-            setProjectList(projectList.filter((project) => project.id !== id));
-        } else {
-            handleErrorMessage("Cannot delete Project, Try again");
-        }
-    };
-
     return (
         <div>
             <div className="modal fade" id="error-modal" tabIndex="-1" aria-labelledby="error-model-label" aria-hidden="true">
@@ -106,17 +79,9 @@ const Profile = (props) => {
                 </div>
             </div>
             <UserInfo userInfo={userInfo} setUserInfo={setUserInfo} handleProfilePhotoChange={handleProfilePhotoChange} handleErrorMessage={handleErrorMessage} />
-            <div className="list-main-container">
-                <div className="container">
-                    <div className="row justify-content-evenly">
-                        <ProfileUserList title="Annotators" list={annotatorList} handleDelete={handleAnnotatorDelete} />
-                        <ProfileUserList title="Projects" list={projectList} handleDelete={handleProjectDelete} />
-                    </div>
-                </div>
-            </div>
             <ProfileRequests handleErrorMessage={handleErrorMessage} />
         </div>
     );
 };
 
-export default connect((state) => ({ auth: state.auth }))(Profile);
+export default connect((state) => ({ auth: state.auth }))(Userprofile);

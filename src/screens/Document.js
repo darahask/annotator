@@ -1,6 +1,7 @@
 import { connect } from "react-redux";
 import Managemodel from "../components/Managemodel";
 import Annotationcanvas from "../components/Annotationcanvas";
+import Annotationlist from "../components/Annotationlist";
 import { useHistory } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useParams } from "react-router-dom";

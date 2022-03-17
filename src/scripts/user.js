@@ -40,8 +40,8 @@ async function updateUserDetails(token, userDetails) {
     } else return false;
 }
 
-async function getRequests(token, type) {
-    let response = await axios.get(server + "get-" + type, {
+async function getRequests(token, data) {
+    let response = await axios.post(server + "get-requests", data, {
         headers: {
             authtoken: token
         }
@@ -49,13 +49,13 @@ async function getRequests(token, type) {
         return null
     });
     if(response.status === 200)
-        return response.data[type]
+        return response.data['requests'].reverse()
     else
         return null
 }
 
-async function getUsersList(token) {
-    let response = await axios.get(server + "get-user-list", {
+async function getProjectsList(token) {
+    let response = await axios.get(server + "get-project-list", {
         headers: {
             authtoken: token
         }
@@ -63,7 +63,7 @@ async function getUsersList(token) {
         return null
     });
     if(response.status === 200)
-        return response.data['user-list']
+        return response.data['project-list']
     else
         return null
 }
@@ -83,7 +83,7 @@ async function sendRequest(token, newRequest) {
 }
 
 async function sendRequestAction(token, id, req_status) {
-    let response = await axios.put(server + "request-list/" + id.toString(), req_status, {
+    let response = await axios.put(server + "request-list", { 'id': id.toString(), 'status': req_status }, {
         headers: {
             authtoken: token
         },
@@ -96,32 +96,4 @@ async function sendRequestAction(token, id, req_status) {
     } else return false;
 }
 
-async function deleteAnnotator(token, id) { 
-    let response = await axios.delete(server + "delete-annotator/" + id.toString(), {
-        headers: {
-            authtoken: token
-        },
-    }).catch(function() {
-        return false;
-    });
-
-    if (response.status === 200) {
-        return true;
-    } else return false;
-}
-
-async function deleteProject(token, id) { 
-    let response = await axios.delete(server + "delete-project/" + id.toString(), {
-        headers: {
-            authtoken: token
-        },
-    }).catch(function() {
-        return false;
-    });
-
-    if (response.status === 200) {
-        return true;
-    } else return false;
-}
-
-export { getNotifications, getUserDetails, updateUserDetails, getRequests, getUsersList, sendRequest, sendRequestAction, deleteAnnotator, deleteProject };
+export { getNotifications, getUserDetails, updateUserDetails, getRequests, getProjectsList, sendRequest, sendRequestAction };

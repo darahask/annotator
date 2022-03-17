@@ -62,7 +62,11 @@ async function doRegister(userDetails) {
 }
 
 async function validateToken(token) {
-    let response = await axios.post(server + 'validate-token', {token})
+    let response = await axios.post(server + 'validate-token', {}, {
+        headers: {
+            authtoken: token,
+        },
+    })
     if(response.status === 200)
         return true
     else

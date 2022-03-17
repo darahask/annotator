@@ -4,8 +4,6 @@ import { updateUserDetails } from "../scripts/user";
 import {connect} from "react-redux";
 
 const UserInfo = (props) => {
-    
-
     const [editDetails, setEditDetails] = useState(false);
     let userInfo = props.userInfo;
     let setUserInfo = props.setUserInfo;

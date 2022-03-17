@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { getRequests, getProjectsList, sendRequest, sendRequestAction } from "../scripts/user";
-import "./../styles/profile.css";
+import { getUsersList } from "../../scripts/project";
+import { getRequests, sendRequest, sendRequestAction } from "../../scripts/user";
+import "../../styles/project.css";
 
-const ProfileRequests = (props) => {
-    const handleErrorMessage = props.handleErrorMessage;
+const ProjectRequests = (props) => {
+    let project_id = props.project_id;
     const [sentRequests, setSentRequests] = useState([]);
     const [receivedRequests, setReceivedRequests] = useState([]);
-    const [projectsList, setProjectsList] = useState([]);
-    const [projectDisplayList, setProjectDisplayList] = useState([]);
+    const [usersList, setUsersList] = useState([]);
+    const [userDisplayList, setUserDisplayList] = useState([]);
     const [newRequestDetails, setNewRequestDetails] = useState({
         title: "",
         description: "",
@@ -18,25 +19,25 @@ const ProfileRequests = (props) => {
     const handleLoadRequests = async (type) => {
         if (type === "sent") {
             let sentRequestsList = await getRequests(props.auth.token, {
-                terminal: "user",
+                terminal: "project",
                 type: "sent",
+                project_id: project_id,
             });
             if (sentRequestsList) setSentRequests(sentRequestsList);
-            else handleErrorMessage("cannot load Sent Requests, Try Again");
         } else {
             let receivedRequestsList = await getRequests(props.auth.token, {
-                terminal: "user",
+                terminal: "project",
                 type: "received",
+                project_id: project_id,
             });
             if (receivedRequestsList) setReceivedRequests(receivedRequestsList);
-            else handleErrorMessage("Cannot load Received Requests, Try Again");
         }
     };
 
-    const handleLoadProjects = async () => {
-        let allProjects = await getProjectsList(props.auth.token);
-        if (allProjects) setProjectsList(allProjects);
-        else handleErrorMessage("Cannot load all users data, Try Again");
+    const handleLoadUsers = async () => {
+        let allUsers = await getUsersList(props.auth.token);
+        if (allUsers) setUsersList(allUsers);
+        else setUsersList([]);
     };
 
     useEffect(() => {
@@ -44,21 +45,19 @@ const ProfileRequests = (props) => {
     }, []);
 
     useEffect(() => {
-        setProjectDisplayList(projectsList);
-    }, [projectsList]);
+        setUserDisplayList(usersList);
+    }, [usersList]);
 
-    const [requestProjectField, setRequestProjectField] = useState({
-        _id: null,
-        title: "",
-        description: "",
-        creator: "",
+    const [requestUsernameField, setRequestUsernameField] = useState({
+        username: "",
+        name: "",
     });
 
     const handleRequestAction = async (id, action) => {
-        let status = await sendRequestAction(props.auth.token, id, action === "accepted" ? "2" : "3");
-        if (status) {
+        let response = await sendRequestAction(props.auth.token, id, action === "accepted" ? "2" : "3");
+        if (response) {
             setReceivedRequests(receivedRequests.map((request) => (request._id === id ? { ...request, status: action } : request)));
-        } else handleErrorMessage("Cannot set Request Status, Try Again");
+        }
     };
 
     const handleRequestDetails = (e, field) => {
@@ -67,64 +66,62 @@ const ProfileRequests = (props) => {
                 ...newRequestDetails,
                 title: e.target.value,
             });
-            document.getElementById("title-invalid").style.display = "none";
+            document.getElementById("project-title-invalid").style.display = "none";
         } else if (field === "description") {
             setNewRequestDetails({
                 ...newRequestDetails,
                 description: e.target.value,
             });
-            document.getElementById("description-invalid").style.display = "none";
+            document.getElementById("project-description-invalid").style.display = "none";
         } else {
             setNewRequestDetails({
                 ...newRequestDetails,
                 role: e.target.value,
             });
-            document.getElementById("role-invalid").style.display = "none";
+            document.getElementById("project-role-invalid").style.display = "none";
         }
     };
 
-    const handleRequestProject = (e) => {
-        setProjectDisplayList(
-            projectsList.filter((project) => {
-                if (project.title.toLowerCase().includes(e.target.value.toLowerCase()) || project.description.toLowerCase().includes(e.target.value.toLowerCase()) || project.creator.toLowerCase().includes(e.target.value.toLowerCase())) return project;
+    const handlerequestUsername = (e) => {
+        setUserDisplayList(
+            usersList.filter((user) => {
+                if (user.name.toLowerCase().includes(e.target.value) || user.username.toLowerCase().includes(e.target.value)) return user;
             })
         );
     };
 
-    const handleProjectSelect = (id) => {
-        setRequestProjectField(projectsList.find((project) => project._id === id));
-        document.getElementById("project-invalid").style.display = "none";
+    const handleUserSelect = (username) => {
+        setRequestUsernameField(usersList.find((user) => user.username === username));
+        document.getElementById("username-invalid").style.display = "none";
     };
 
     const handleNewRequestSend = async () => {
         let flag = true;
         if (newRequestDetails.title === "") {
-            document.getElementById("title-invalid").style.display = "inline";
+            document.getElementById("project-title-invalid").style.display = "inline";
             flag = false;
         }
         if (newRequestDetails.description === "") {
-            document.getElementById("description-invalid").style.display = "inline";
+            document.getElementById("project-description-invalid").style.display = "inline";
             flag = false;
         }
-        if (newRequestDetails.role === "") {
-            document.getElementById("role-invalid").style.display = "inline";
+        if (newRequestDetails.role === "0") {
+            document.getElementById("project-role-invalid").style.display = "inline";
             flag = false;
         }
-        if (requestProjectField._id === null) {
-            document.getElementById("project-invalid").style.display = "inline";
+        if (requestUsernameField.username === "") {
+            document.getElementById("username-invalid").style.display = "inline";
             flag = false;
         }
         if (flag) {
-            let status = await sendRequest(props.auth.token, {
+            await sendRequest(props.auth.token, {
                 title: newRequestDetails.title,
                 description: newRequestDetails.description,
                 role: newRequestDetails.role,
-                project: requestProjectField._id,
-                terminal: "user",
+                user: requestUsernameField.username,
+                project: project_id,
+                terminal: "project",
             });
-            if (!status) {
-                handleErrorMessage("Request not sent, Try Again");
-            }
         }
         handleNewRequestReset();
     };
@@ -135,11 +132,9 @@ const ProfileRequests = (props) => {
             description: "",
             role: "0",
         });
-        setRequestProjectField({
-            _id: null,
-            title: "",
-            description: "",
-            creator: "",
+        setRequestUsernameField({
+            username: "",
+            name: "",
         });
     };
 
@@ -187,7 +182,7 @@ const ProfileRequests = (props) => {
                         aria-controls="nav-newrequest"
                         aria-selected="false"
                         onClick={() => {
-                            handleLoadProjects();
+                            handleLoadUsers();
                         }}
                     >
                         <div className="nav-button">New Request</div>
@@ -201,7 +196,7 @@ const ProfileRequests = (props) => {
                             {sentRequests.length === 0 ? (
                                 <div className="parent" style={{ width: "100%", height: "150px", textAlign: "center" }}>
                                     <div className="child description">
-                                        You do not have any Sent Requests. You can send a new request using the <span style={{ fontSize: "18px", fontWeight: "bold", paddingLeft: "5px", paddingRight: "5px" }}>New Request</span> Section.
+                                        Project has no Sent Requests. Send a new request using the <span style={{ fontSize: "18px", fontWeight: "bold", paddingLeft: "5px", paddingRight: "5px" }}>New Request</span> Section.
                                     </div>
                                 </div>
                             ) : (
@@ -263,7 +258,7 @@ const ProfileRequests = (props) => {
                                                     {request.role}
                                                 </span>
                                                 <span className="rounded tag" style={{ color: "#7c605c" }}>
-                                                    {request.project.title}
+                                                    {request.user.username}
                                                 </span>
                                             </div>
                                         </div>
@@ -278,7 +273,7 @@ const ProfileRequests = (props) => {
                         <div className="col-md-8 list-container">
                             {receivedRequests.length === 0 ? (
                                 <div className="parent" style={{ width: "100%", height: "150px", textAlign: "center" }}>
-                                    <div className="child description">You do not have any Received Requests</div>
+                                    <div className="child description">Project has no Received Requests</div>
                                 </div>
                             ) : (
                                 <div className="d-grid gap-3 list p-3">
@@ -342,7 +337,7 @@ const ProfileRequests = (props) => {
                                                                 {request.role}
                                                             </span>
                                                             <span className="rounded tag" style={{ color: "#7c605c" }}>
-                                                                {request.project.title}
+                                                                {request.user.username}
                                                             </span>
                                                         </div>
                                                     </div>
@@ -431,7 +426,7 @@ const ProfileRequests = (props) => {
                                                         {request.role}
                                                     </span>
                                                     <span className="rounded tag" style={{ color: "#7c605c" }}>
-                                                        {request.project.title}
+                                                        {request.user.username}
                                                     </span>
                                                 </div>
                                             </div>
@@ -459,7 +454,7 @@ const ProfileRequests = (props) => {
                                             handleRequestDetails(e, "title");
                                         }}
                                     />
-                                    <span id="title-invalid" className="field-invalid">
+                                    <span id="project-title-invalid" className="field-invalid">
                                         field is required
                                     </span>
                                 </div>
@@ -476,7 +471,7 @@ const ProfileRequests = (props) => {
                                             handleRequestDetails(e, "description");
                                         }}
                                     ></textarea>
-                                    <span id="description-invalid" className="field-invalid">
+                                    <span id="project-description-invalid" className="field-invalid">
                                         field is required
                                     </span>
                                 </div>
@@ -489,30 +484,30 @@ const ProfileRequests = (props) => {
                                             <select
                                                 className="form-control"
                                                 id="type"
-                                                defaultValue=""
+                                                defaultValue={newRequestDetails.role}
                                                 onChange={(e) => {
                                                     handleRequestDetails(e, "role");
                                                 }}
                                             >
-                                                <option disabled value="">
+                                                <option value="0">
                                                     Choose...
                                                 </option>
                                                 <option value="1">owner</option>
                                                 <option value="2">staff</option>
                                             </select>
-                                            <span id="role-invalid" className="field-invalid">
+                                            <span id="project-role-invalid" className="field-invalid">
                                                 field is required
                                             </span>
                                         </div>
                                         <div>
                                             <label htmlFor="username" className="form-label">
-                                                Project
+                                                Username
                                             </label>
-                                            <input type="text" className="form-control" id="request-username" value={requestProjectField.title} disabled aria-describedby="request-username-help" />
+                                            <input type="text" className="form-control" id="request-username" value={requestUsernameField.username} disabled aria-describedby="request-username-help" />
                                             <div id="request-username-help" className="form-text">
-                                                Select using the projects section
+                                                Select using the users section
                                             </div>
-                                            <span id="project-invalid" className="field-invalid">
+                                            <span id="username-invalid" className="field-invalid">
                                                 field is required
                                             </span>
                                         </div>
@@ -531,9 +526,9 @@ const ProfileRequests = (props) => {
                                             <input
                                                 type="text"
                                                 className="search-bar"
-                                                placeholder="Search Project"
+                                                placeholder="Search User"
                                                 onChange={(e) => {
-                                                    handleRequestProject(e);
+                                                    handlerequestUsername(e);
                                                 }}
                                             />
                                         </div>
@@ -541,19 +536,18 @@ const ProfileRequests = (props) => {
                                 </div>
                                 <div className="row border border-top-0 border-dark shadow-lg">
                                     <div className="search-box-container">
-                                        {projectDisplayList.map((project, index) => (
+                                        {userDisplayList.map((user, index) => (
                                             <div
                                                 key={index}
                                                 className="search-box-item border rounded shadow-sm"
                                                 onClick={() => {
-                                                    handleProjectSelect(project._id);
+                                                    handleUserSelect(user.username);
                                                 }}
                                             >
-                                                <div className="name">{project.title}</div>
-                                                <div className="description">{project.description}</div>
+                                                <div className="name">{user.name}</div>
                                                 <div className="username-container">
-                                                    <span className="username-helpertext">created by:</span>
-                                                    <span className="username">{project.creator}</span>
+                                                    <span className="username-helpertext">username:</span>
+                                                    <span className="username">{user.username}</span>
                                                 </div>
                                             </div>
                                         ))}
@@ -586,4 +580,4 @@ const ProfileRequests = (props) => {
     );
 };
 
-export default connect((state) => ({ auth: state.auth }))(ProfileRequests);
+export default connect((state) => ({ auth: state.auth }))(ProjectRequests);
