@@ -1,8 +1,8 @@
 import axios from "axios";
 import { server, socketPath } from "../constants/constant";
 
-async function getDocument(token, id) {
-    let response = await axios.get(server + `user-document-list/${id}`, {
+async function getDocument(token, data) {
+    let response = await axios.post(server + 'document-detail', data, {
         headers: {
             authtoken: token
         },
@@ -14,8 +14,20 @@ async function getDocument(token, id) {
     return response
 }
 
-async function getAnnotations(token, id) {
-    let response = await axios.get(server + 'document-annotation-list',  {
+async function getAnnotations(token, data) {
+    let response = await axios.post(server + 'annotation-list', data, {
+        headers: {
+            authtoken: token
+        },
+    }).catch(function(error) {
+        console.log(error)
+        return null;
+    });
+    return response.data
+}
+
+async function addAnnotations(token, data) {
+    let response = await axios.post(server + 'annotation', data, {
         headers: {
             authtoken: token
         },
@@ -27,9 +39,17 @@ async function getAnnotations(token, id) {
     return response
 }
 
-async function socketConnect(id) {
-    const socket = new WebSocket(socketPath + id.toString() + '/');
-    return socket
+async function deleteAnnotation(token, data) {
+    await axios.delete(server + 'annotation', {
+        headers: {
+            authtoken: token
+        },
+        data: data,
+    }).catch(function(error) {
+        console.log(error)
+        return false;
+    });
+    return true
 }
 
 async function trainModel(token, model_name, id) {
@@ -45,4 +65,4 @@ async function trainModel(token, model_name, id) {
     return response
 }
 
-export { getDocument, socketConnect, trainModel }
+export { getDocument, deleteAnnotation, trainModel, getAnnotations, addAnnotations }

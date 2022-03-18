@@ -5,7 +5,6 @@ import { server } from '../constants/constant'
 async function doLogin(userDetails, rememberme) {
     let response = await axios.post(server + 'login', userDetails).catch(function(error) {
         if (error.response) {
-            console.log(error.response.data);
             return {
                 type: LOGIN_FAIL,
                 payload: {
@@ -14,8 +13,6 @@ async function doLogin(userDetails, rememberme) {
             }
         }
     })
-
-    console.log(response)
 
     if (response.status === 200) {
         return {
@@ -33,10 +30,8 @@ async function doLogin(userDetails, rememberme) {
 }
 
 async function doRegister(userDetails) {
-    console.log(userDetails)
     let response = await axios.post(server + 'register', userDetails).catch(function(error) {
         if (error.response) {
-            console.log(error.response.data);
             return {
                 type: REGISTER_FAIL,
                 payload: {
@@ -45,8 +40,6 @@ async function doRegister(userDetails) {
             }
         }
     })
-
-    console.log('register response', response)
 
     if (response.status === 200) {
         return {

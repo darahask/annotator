@@ -76,6 +76,8 @@ const Project = (props) => {
     const handleLeaveProject = async () => {
         let status = await leaveProject(props.auth.token, projectInfo._id);
         if (status) {
+            setOwnedProjects(ownedProjects.filter((project) => project._id !== projectInfo._id))
+            setSharedProjects(sharedProjects.filter((project) => project._id !== projectInfo._id))
             history.push("/projects");
         }
     };
@@ -159,8 +161,8 @@ const Project = (props) => {
                     <div className="list-main-container">
                         <div className="container">
                             <div className="row justify-content-evenly">
-                                <UserList title="Owners" list={owners} isOwner={isOwner} type="owner" handleDelete={handleDelete} />
-                                <UserList title="Staff" list={staff} isOwner={isOwner} type="staff" handleDelete={handleDelete} />
+                                <UserList title="Owners" list={owners} isOwner={isOwner} type="owner" creator={projectInfo.creator} handleDelete={handleDelete} />
+                                <UserList title="Staff" list={staff} isOwner={isOwner} type="staff" creator={projectInfo.creator} handleDelete={handleDelete} />
                             </div>
                         </div>
                     </div>

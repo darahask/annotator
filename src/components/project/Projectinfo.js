@@ -1,3 +1,5 @@
+import { connect } from "react-redux";
+
 const Projectinfo = (props) => {
     let projectInfo = props.projectInfo;
     let handleLeaveProject = props.handleLeaveProject;
@@ -23,10 +25,12 @@ const Projectinfo = (props) => {
                         <div className="project-field-value">{projectInfo["creator"]}</div>
                     </div>
                 </div>
-                <button type="button" className="btn btn-danger" style={{ marginTop: "30px" }} onClick={() => {handleLeaveProject()}}>Leave Project</button>
+                { props.auth.username ===  projectInfo["creator"] ? (<></>) : (
+                    <button type="button" className="btn btn-danger" style={{ marginTop: "30px" }} onClick={() => {handleLeaveProject()}}>Leave Project</button>
+                )}
             </div>
         </div>
     );
 };
 
-export default Projectinfo;
+export default connect((state) => ({ auth: state.auth }))(Projectinfo);

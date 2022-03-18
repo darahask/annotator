@@ -1,7 +1,7 @@
 import "../../styles/profile.css";
 
 const UserList = (props) => {
-    const { title, list, isOwner, type, handleDelete } = props;
+    const { title, list, isOwner, type, creator, handleDelete } = props;
 
     return (
         <div className="col-md-5 list-container">
@@ -21,7 +21,7 @@ const UserList = (props) => {
                                     <div className="list-item-description">{user.description}</div>
                                 </div>
                                 <div className="col-2 delete-icon-container">
-                                    {isOwner ? (
+                                    {isOwner && user.username !== creator ? (
                                         <i
                                             className="fas fa-trash delete-icon"
                                             onClick={() => {

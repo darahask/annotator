@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
+import { addAnnotations, deleteAnnotation } from "../scripts/document";
 import "../styles/popup.css";
 
 const Annotationcanvas = ({ data }) => {
     let ref = useRef();
-    let { annotations, setAnnotations } = data;
+    let { annotations, setAnnotations, documentImage, token, projectId, documentId } = data;
 
     useEffect(() => {
         let canvas = ref.current;
@@ -13,8 +14,7 @@ const Annotationcanvas = ({ data }) => {
         let isDragging = false;
 
         let image = new Image();
-        image.src =
-            "https://res.cloudinary.com/practicaldev/image/fetch/s--_7arERV2--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://dev-to-uploads.s3.amazonaws.com/i/ikkj6js77uyo7m0rd1ud.jpeg";
+        image.src = "data:image/png;base64," + documentImage;
         image.onload = () => {
             canvas.width = image.width;
             canvas.height = image.height;
@@ -51,12 +51,7 @@ const Annotationcanvas = ({ data }) => {
                         ctx.drawImage(shape.img, 0, 0);
                     } else {
                         ctx.lineWidth = 2;
-                        ctx.strokeRect(
-                            shape.x,
-                            shape.y,
-                            shape.width,
-                            shape.height
-                        );
+                        ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
                     }
                 }
             }
@@ -163,24 +158,61 @@ const Annotationcanvas = ({ data }) => {
             shapes[selectedRectangle].isAntiPattern = e.target.checked;
         };
 
-        document.getElementById("pop-save").onclick = (e) => {
+        document.getElementById("pop-save").onclick = async (e) => {
             e.preventDefault();
             let lannotations = shapes.filter((shape) => {
                 return shape.type === "rectangle" && shape.name ? true : false;
             });
-            setAnnotations(lannotations);
+            let shape = shapes[selectedRectangle];
+            let rect = {
+                project: projectId,
+                document: documentId,
+                annotation: {
+                    _id: shape._id ?? "",
+                    name: shape.name,
+                    topX: shape.x,
+                    topY: shape.y,
+                    bottomX: shape.x + shape.width,
+                    bottomY: shape.y + shape.height,
+                    is_antipattern: shape.isAntiPattern,
+                },
+            };
+            let response = await addAnnotations(token, rect);
+            if (response) {
+                setAnnotations(lannotations);
+            }
             popup.style.display = "none";
         };
 
-        document.getElementById("pop-delete").onclick = (e) => {
+        document.getElementById("pop-delete").onclick = async (e) => {
             e.preventDefault();
-            shapes.splice(selectedRectangle, 1);
-            drawAll();
-            let lannotations = shapes.filter((shape) => {
-                return shape.type === "rectangle" ? true : false;
-            });
-            setAnnotations(lannotations);
-            popup.style.display = "none";
+            if (shapes[selectedRectangle]._id) {
+                let response = await deleteAnnotation(token, {
+                    project: projectId,
+                    document: documentId,
+                    annotation: {
+                        _id: shapes[selectedRectangle]._id,
+                        user: shapes[selectedRectangle].user
+                    },
+                });
+                if (response) {
+                    shapes.splice(selectedRectangle, 1);
+                    drawAll();
+                    let lannotations = shapes.filter((shape) => {
+                        return shape.type === "rectangle" ? true : false;
+                    });
+                    setAnnotations(lannotations);
+                    popup.style.display = "none";
+                }
+            } else {
+                shapes.splice(selectedRectangle, 1);
+                drawAll();
+                let lannotations = shapes.filter((shape) => {
+                    return shape.type === "rectangle" ? true : false;
+                });
+                setAnnotations(lannotations);
+                popup.style.display = "none";
+            }
         };
 
         document.getElementById("pop-close").onclick = (e) => {
@@ -208,20 +240,10 @@ const Annotationcanvas = ({ data }) => {
                     <label htmlFor="pop-name" className="form-label">
                         Name
                     </label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="pop-name"
-                        aria-describedby="emailHelp"
-                        required
-                    ></input>
+                    <input type="text" className="form-control" id="pop-name" aria-describedby="emailHelp" required></input>
                 </div>
                 <div className="mb-3 form-check">
-                    <input
-                        type="checkbox"
-                        className="form-check-input"
-                        id="pop-check"
-                    ></input>
+                    <input type="checkbox" className="form-check-input" id="pop-check"></input>
                     <label className="form-check-label" htmlFor="pop-check">
                         Mark as anti-pattern
                     </label>
