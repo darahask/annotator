@@ -145,9 +145,9 @@ let SearchBar = (props) => {
     const searchItems = (searchValue) => {
         showLoader();
         setSearchInput(searchValue);
-        if (searchInput !== "") {
+        if (searchValue.length>0) {
             const filteredData = APIData.filter((item) => {
-                return Object.values(item).join("").toLowerCase().includes(searchInput.toLowerCase());
+                return Object.values(item).join("").toLowerCase().includes(searchValue.toLowerCase());
             });
             hideLoader();
             setFilteredResults(filteredData);
