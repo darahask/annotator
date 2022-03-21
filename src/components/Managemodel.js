@@ -2,62 +2,23 @@ import { connect } from "react-redux";
 import "./../styles/profile.css";
 import "./../styles/managemodel.css";
 import { useState } from "react";
-import { socketConnect, trainModel } from "../scripts/document";
+import { annotateDocument, createModelPool, getModelPools, saveModelPool, trainModel } from "../scripts/document";
 import { useEffect } from "react";
 
 const Managemodel = (props) => {
-    const [modelpoolList, setModelpoolList] = useState([
-        {
-            id: 1,
-            name: "Model Pool 1",
-            description: "This is model pool 1",
-            sub_modelpools: [
-                {
-                    id: 2,
-                    name: "mp2dkjnksdjhbvnlsdkfn kfnkldfhlkdfnlkbnkdfbnjjvdfvjdbnfdbfkjfndkjfbnsdklfvbjs",
-                    is_active: true,
-                },
-                {
-                    id: 3,
-                    name: "mp3",
-                    is_active: false,
-                },
-            ],
-            subdescription_list: "This is sub description list of Model Pool 1",
-            pool_models: ["m1", "m2"],
-            is_selected: false,
-        },
-        {
-            id: 10,
-            name: "Model Pool 2",
-            description: "This is model pool 2",
-            sub_modelpools: [
-                {
-                    id: 4,
-                    name: "mp4",
-                    is_active: false,
-                },
-                {
-                    id: 5,
-                    name: "mp5",
-                    is_active: true,
-                },
-            ],
-            subdescription_list: "This is sub description list of Model Pool 2",
-            pool_models: ["m3", "m4"],
-            is_selected: false,
-        },
-    ]);
+    let projectId = props.projectId;
+    let documentId = props.documentId;
 
-    const [displayedModelPools, setDisplayedModelPools] = useState(modelpoolList);
+    const [modelpoolList, setModelpoolList] = useState([]);
+
+    const [displayedModelPools, setDisplayedModelPools] = useState([]);
     const [selectedModelpools, setSelectedModelpools] = useState([]);
 
     const [modalModelPool, setModalModelPool] = useState({
         id: "",
         name: "",
         description: "",
-        sub_modelpools: [],
-        subdescription_list: "",
+        modelpool_list: [],
         pool_models: [],
     });
 
@@ -74,86 +35,73 @@ const Managemodel = (props) => {
     };
 
     const handleModelpoolSelect = (val, id) => {
-        setModelpoolList(modelpoolList.map((modelpool) => (modelpool.id === id ? { ...modelpool, is_selected: val } : modelpool)));
-        setDisplayedModelPools(displayedModelPools.map((modelpool) => (modelpool.id === id ? { ...modelpool, is_selected: val } : modelpool)));
+        setModelpoolList(modelpoolList.map((modelpool) => (modelpool._id === id ? { ...modelpool, is_selected: val } : modelpool)));
+        setDisplayedModelPools(displayedModelPools.map((modelpool) => (modelpool._id === id ? { ...modelpool, is_selected: val } : modelpool)));
         if (val) {
             var pools = selectedModelpools;
-            pools.push(modelpoolList.find((modelpool) => modelpool.id === id));
+            pools.push(modelpoolList.find((modelpool) => modelpool._id === id));
             setSelectedModelpools(pools);
         } else {
-            setSelectedModelpools(selectedModelpools.filter((modelpool) => modelpool.id !== id));
+            setSelectedModelpools(selectedModelpools.filter((modelpool) => modelpool._id !== id));
         }
     };
 
     const handleModalSubModelPool = (val, id) => {
-        setModalModelPool({ ...modalModelPool, sub_modelpools: modalModelPool.sub_modelpools.map((modelpool) => (modelpool.id === id ? { ...modelpool, is_active: val } : modelpool)) });
+        console.log(val)
+        setModalModelPool({ ...modalModelPool, modelpool_list: modalModelPool.modelpool_list.map((modelpool) => (modelpool._id === id ? { ...modelpool, is_active: val } : modelpool)) });
     };
 
     const handleMoreInfo = (id) => {
-        setModalModelPool(modelpoolList.find((modelpool) => modelpool.id === id));
+        setModalModelPool(modelpoolList.find((modelpool) => modelpool._id === id));
         document.getElementById("modal-toggle").click();
     };
 
-    const handleSocketConnect = () => {
-        var socket = new WebSocket("ws://127.0.0.1:8000/ws/1/");
-        socket.onmessage = (e) => {
-            var data = JSON.parse(e.data);
-            console.log(data)
-            setTPM(data.message);
-            setTPP(data.percentage);
-        };
-        socket.onclose = () => {
-            console.log('socket closed')
-            setTPM('Something went wrong. Try again');
-            setTPP(0);
-        };
+    function updateTrainingProgress(val) {
+        if(val < 90) {
+            setTimeout(() => {
+                let perc = Math.floor(Math.random() * 11 + 10)
+                if(trainingProgressPercentage === 100) {
+                    val = 100;
+                    setTPP(100);
+                } else {
+                    if(val + perc < 90) {
+                        val += perc
+                        setTPP(val);
+                        if (val > 50) {
+                            setTPM('Started Training...');
+                        } else if(val > 20) {
+                            setTPM('Collecting Annotations');
+                        }
+                    } else {
+                        val = 90;
+                        setTPP(90);
+                        setTPM('Saving Model');
+                    }
+                    updateTrainingProgress(val);
+                }
+            }, 3000)
+        }
     }
 
-    useEffect(() => {
-        // var socket = new WebSocket("ws://127.0.0.1:8000/ws/1/");
-        // socket.onmessage = (e) => {
-        //     var data = JSON.parse(e.data);
-        //     console.log(data)
-        //     setTPM(data.message);
-        //     setTPP(data.percentage);
-        // };
-        // socket.onclose = () => {
-        //     console.log('socket closed')
-        //     setTPM('Something went wrong. Try again');
-        //     setTPP(0);
-        // };
-        // console.log(socket)
-    }, [])
-
     const handleModelTrain = async () => {
-        setTPM('');
+        setTPM('Collecting data');
         setTPP(0);
-        var p=0
-        for(var i=0;i<10000000000;i++) {
-            p += 1
-        }
-        console.log(p);
+        updateTrainingProgress(0);
 
         var model_name = document.getElementById("modelname-input").value;
         if (model_name.split(" ").join("") === "") {
             setTMM("field required");
         } else {
-            setTMM("");
-
-            
-
+            setTMM("Started Training Process");
             model_name = model_name.split(" ").join(" ");
-            let response = await trainModel(props.auth.token, model_name, 1);
+            let response = await trainModel(props.auth.token, {
+                model_name: model_name,
+                project: projectId
+            });
             if(response) {
-                console.log(response)
-                if(response.status === 200) {
-                    setTPM('model successfully trained');
-                    setTPP(100);
-                } else {
-                    setTMM(response.data.message)
-                    setTPM('Something went wrong. Try again');
-                    setTPP(0);
-                }
+                setTPM('model successfully trained');
+                setTMM('')
+                setTPP(100);
             } else {
                 setTMM("Training failed. Try again")
                 setTPM('Something went wrong. Try again');
@@ -162,6 +110,64 @@ const Managemodel = (props) => {
         }
     };
 
+    const handleCreateModelPool = async () => {
+        let title = document.getElementById('cm-title').value;
+        let description = document.getElementById('cm-description').value;
+        let status = await createModelPool(props.auth.token, {
+            'name': title,
+            'description': description,
+            'project': projectId,
+            'selected_modelpools': selectedModelpools
+        })
+        if (status) {
+            console.log("Success")
+        }
+    }
+
+    const handleModelPoolSave = async () => {
+        let status_list = []
+        for(let i=0;i<modalModelPool.modelpool_list.length;i++){
+            status_list.push({
+                main_modelpool: modalModelPool._id,
+                sub_modelpool: modalModelPool.modelpool_list[i]._id,
+                is_active: modalModelPool.modelpool_list[i].is_active
+            })
+        }
+        let status = await saveModelPool(props.auth.token, status_list);
+        if(status) {
+            setModelpoolList(modelpoolList.map((modelpool) => {
+                if(modelpool._id === modalModelPool._id) {
+                    return modalModelPool
+                } else {
+                    return modelpool
+                }
+            })) 
+        }
+    }
+
+    const handleLoadModelPools = async () => {
+        let response = await getModelPools(props.auth.token, {
+            'project': projectId
+        });
+        if(response) {
+            setModelpoolList(response);
+            setDisplayedModelPools(response);
+            setSelectedModelpools([])
+        }
+    }
+
+    const handleAnnotatedocument = async () => {
+        let status = await annotateDocument(props.auth.token, {
+            'project': projectId,
+            'document': documentId,
+            'selected_modelpools': selectedModelpools
+        })
+        if(status) {
+            console.log('Success')
+            window.location.reload()
+        }
+    }
+
     return (
         <div className="container">
             <nav>
@@ -169,7 +175,7 @@ const Managemodel = (props) => {
                     <button className="col-6 nav-link active" id="nav-train-tab" data-bs-toggle="tab" data-bs-target="#nav-train" type="button" role="tab" aria-controls="nav-train" aria-selected="true">
                         <div className="nav-button">Train Model</div>
                     </button>
-                    <button className="col-6 nav-link" id="nav-auto-annotate-tab" data-bs-toggle="tab" data-bs-target="#nav-auto-annotate" type="button" role="tab" aria-controls="nav-auto-annotate" aria-selected="false">
+                    <button className="col-6 nav-link" id="nav-auto-annotate-tab" data-bs-toggle="tab" data-bs-target="#nav-auto-annotate" type="button" role="tab" aria-controls="nav-auto-annotate" aria-selected="false" onClick={() => {handleLoadModelPools()}}>
                         <div className="nav-button">Auto Annotate</div>
                     </button>
                 </div>
@@ -195,7 +201,7 @@ const Managemodel = (props) => {
                                 <div className="modelinput-errormsg">{trainModelMessage}</div>
                             </div>
                             <div className="col-4 col-md-2" style={{ textAlign: "center" }}>
-                                <button id="train-button" onClick={() => {handleSocketConnect(); handleModelTrain();}}>
+                                <button id="train-button" onClick={() => {handleModelTrain()}}>
                                     Train
                                 </button>
                             </div>
@@ -220,7 +226,7 @@ const Managemodel = (props) => {
                                     <div className="modal-sub-title">Sub ModelPools</div>
                                     <div className="modal-subcontainer border-bottoms">
                                         <div className="row pills-container">
-                                            {modalModelPool.sub_modelpools.map((modelpool, i) => (
+                                            {modalModelPool.modelpool_list.map((modelpool, i) => (
                                                 <div key={i} className="col-auto selected-pill rounded">
                                                     <div className="row">
                                                         <div className="col-auto pill-title">{modelpool.name}</div>
@@ -231,7 +237,7 @@ const Managemodel = (props) => {
                                                                 value=""
                                                                 checked={modelpool.is_active}
                                                                 onChange={(e) => {
-                                                                    handleModalSubModelPool(e.target.checked, modelpool.id);
+                                                                    handleModalSubModelPool(e.target.checked, modelpool._id);
                                                                 }}
                                                             />
                                                         </div>
@@ -240,14 +246,12 @@ const Managemodel = (props) => {
                                             ))}
                                         </div>
                                     </div>
-                                    <div className="modal-sub-title">Sub Description List</div>
-                                    <div className="modal-desc border-bottom">{modalModelPool.subdescription_list}</div>
                                     <div className="modal-sub-title">Models</div>
                                     <div className="modal-subcontainer border-bottoms">
                                         <div className="row pills-container">
                                             {modalModelPool.pool_models.map((model, i) => (
                                                 <div key={i} className="col-auto selected-pill rounded" style={{ backgroundColor: "#ffdeeb", borderColor: "#7e191b" }}>
-                                                    <div className="col-auto modelpill-title">{model}</div>
+                                                    <div className="col-auto modelpill-title">{model.name}</div>
                                                 </div>
                                             ))}
                                         </div>
@@ -257,7 +261,7 @@ const Managemodel = (props) => {
                                     <button type="button" className="btn btn-danger" data-bs-dismiss="modal">
                                         Delete
                                     </button>
-                                    <button type="button" className="btn btn-primary">
+                                    <button type="button" className="btn btn-primary" onClick={() => {handleModelPoolSave()}}>
                                         Save
                                     </button>
                                 </div>
@@ -296,7 +300,7 @@ const Managemodel = (props) => {
                                                             value=""
                                                             checked={modelpool.is_selected}
                                                             onChange={(e) => {
-                                                                handleModelpoolSelect(e.target.checked, modelpool.id);
+                                                                handleModelpoolSelect(e.target.checked, modelpool._id);
                                                             }}
                                                         />
                                                     </div>
@@ -306,7 +310,7 @@ const Managemodel = (props) => {
                                                         <div className="username-container">
                                                             <span className="username-helpertext rounded">sub modelpools:</span>
                                                             <span className="username">
-                                                                {modelpool.sub_modelpools.map((submodelpool, j) => (
+                                                                {modelpool.modelpool_list.map((submodelpool, j) => (
                                                                     <span key={j} className="rounded submodelpool-pill" style={{ backgroundColor: submodelpool.is_active ? "#6fc0ab" : "#e2b1cd" }}>
                                                                         {submodelpool.name}
                                                                     </span>
@@ -316,7 +320,7 @@ const Managemodel = (props) => {
                                                         <div
                                                             className="moreinfo-tag"
                                                             onClick={() => {
-                                                                handleMoreInfo(modelpool.id);
+                                                                handleMoreInfo(modelpool._id);
                                                             }}
                                                         >
                                                             more info
@@ -342,7 +346,7 @@ const Managemodel = (props) => {
                                                         <div
                                                             className="col-auto cancel-sign"
                                                             onClick={() => {
-                                                                handleModelpoolSelect(false, modelpool.id);
+                                                                handleModelpoolSelect(false, modelpool._id);
                                                             }}
                                                         >
                                                             &#x2717;
@@ -353,7 +357,7 @@ const Managemodel = (props) => {
                                         </div>
                                     </div>
                                     <div>
-                                        <button className="btn btn-success annotate-button">Annotate</button>
+                                        <button className="btn btn-success annotate-button" onClick={() => {handleAnnotatedocument()}}>Annotate</button>
                                     </div>
                                 </div>
                                 <div className="create-modelpool">
@@ -361,19 +365,19 @@ const Managemodel = (props) => {
                                         <div className="col-md-4">
                                             <div className="input-group mb-3">
                                                 <span className="input-group-text input-helpertext">Title</span>
-                                                <input type="text" className="form-control input-field" maxLength={24} />
+                                                <input id="cm-title" type="text" className="form-control input-field" maxLength={24} />
                                             </div>
                                         </div>
                                         <div className="col-md-8">
                                             <div className="input-group mb-3">
                                                 <span className="input-group-text input-helpertext">Description</span>
-                                                <input type="text" className="form-control input-field" />
+                                                <input id="cm-description" type="text" className="form-control input-field" />
                                             </div>
                                         </div>
                                         <div className="hint">above selected modelpools are used to create the modelpool</div>
                                     </div>
                                     <div>
-                                        <button className="btn btn-success create-button">Create ModelPool</button>
+                                        <button className="btn btn-success create-button" onClick={() => {handleCreateModelPool()}}>Create ModelPool</button>
                                     </div>
                                 </div>
                             </div>

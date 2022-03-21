@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import "../styles/sidebar.css";
 
 const Sidebar = (props) => {
@@ -7,13 +8,30 @@ const Sidebar = (props) => {
     let type = props.type;
     let path = props.path;
 
+    const [projectName, setProjectName] = useState("")
+
+    useEffect(() => {
+        let project = ownedProjects.find((project) => project._id === project_id)
+        if(project) {
+            setProjectName(project.title)
+        } else {
+            project = sharedProjects.find((project) => project._id === project_id)
+            if(project) {
+                setProjectName(project.title)
+            }
+        }
+    }, [])
+
     return (
         <div id="projectSideBar">
             <nav className="navbar navbar-light bg-light fixed-left">
                 <div className="container-fluid">
-                    <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
-                        <span className="navbar-toggler-icon"></span>
-                    </button>
+                    <div>
+                        <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" style={{display: "inline"}}>
+                            <span className="navbar-toggler-icon"></span>
+                        </button>
+                        {type === "1" ? <h4 className="navbar-brand ms-4" style={{display: "inline"}}>{projectName}</h4> : (<></>)}
+                    </div>
                     {type === "1" ? (
                         <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#UploadDocumentModal">
                             Upload Document

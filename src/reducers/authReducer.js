@@ -6,10 +6,11 @@ import {
     REGISTER_FAIL,
 } from "./../actions/authAction";
 
-const token = sessionStorage.getItem('token');
-const initialState = {
-    token: token,
-    isAuthenticated: !token ? false : true,
+const state = JSON.parse( sessionStorage.getItem('state'));
+const initialState = state ?? {
+    token: null,
+    username: null,
+    isAuthenticated: false,
     rememberme: false,
     message: null
 };
@@ -19,30 +20,34 @@ export default function authReducer(state = initialState, action) {
 
     switch (type) {
         case LOGIN_SUCCESS:
-            if (action.payload.rememberme)
-                localStorage.setItem("token", payload.token);
-            sessionStorage.setItem("token", payload.token);
-            return {
+            var temp = {
                 ...state,
                 token: payload.token,
+                username: payload.username,
                 isAuthenticated: true
             };
+            if (payload.rememberme)
+                localStorage.setItem("state", JSON.stringify(payload));
+            sessionStorage.setItem("state", JSON.stringify(payload));
+            return temp;
         case LOGIN_FAIL:
-            localStorage.removeItem("token");
-            sessionStorage.removeItem("token");
+            localStorage.removeItem("state");
+            sessionStorage.removeItem("state");
             return {
                 ...state,
                 token: null,
                 isAuthenticated: false,
-                message: action.payload.message
+                message: payload.message
             };
         case REGISTER_SUCCESS:
-            sessionStorage.setItem("token", payload.token);
-            return {
+            var temp = {
                 ...state,
                 token: payload.token,
+                username: payload.username,
                 isAuthenticated: true
             };
+            sessionStorage.setItem("state", JSON.stringify(payload));
+            return temp;
         case REGISTER_FAIL:
             return {
                 ...state,
@@ -50,8 +55,8 @@ export default function authReducer(state = initialState, action) {
                 isAuthenticated: false,
             };
         case LOGOUT:
-            localStorage.removeItem("token");
-            sessionStorage.removeItem("token");
+            localStorage.removeItem("state");
+            sessionStorage.removeItem("state");
             return {
                 ...state,
                 token: null,

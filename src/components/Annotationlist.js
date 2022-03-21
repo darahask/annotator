@@ -51,8 +51,7 @@ const Annotationlist = ({ data }) => {
     }
 
     return (
-        <div className="mt-3 p-3" style={{ border: "1px solid black" }}>
-            <h3>Annotations</h3>
+        <div style={{ maxHeight: "400px", overflow: "auto" }}>
             {getUi()}
         </div>
     );

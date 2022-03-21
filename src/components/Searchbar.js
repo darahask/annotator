@@ -24,10 +24,15 @@ function Card(props) {
 }
 
 let SearchBar = (props) => {
+
+    let history = useHistory();
+    if (!props.auth.token) {
+        history.push("/login");
+    }
+
     const [APIData, setAPIData] = useState([]);
     const [filteredResults, setFilteredResults] = useState([]);
     const [searchInput, setSearchInput] = useState("");
-    let history = useHistory();
     const [loaderComponent, showLoader, hideLoader] = useFullPageLoader();
 
     const { projectId } = useParams();
@@ -133,16 +138,16 @@ let SearchBar = (props) => {
     //         })
     // }, [])
 
-    let combineData = (name,description) => {
-        return name + " " + description
-    }
+    // let combineData = (name,description) => {
+    //     return name + " " + description
+    // }
 
     const searchItems = (searchValue) => {
         showLoader();
         setSearchInput(searchValue);
-        if (searchInput !== "") {
+        if (searchValue.length>0) {
             const filteredData = APIData.filter((item) => {
-                return Object.values(item).join("").toLowerCase().includes(searchInput.toLowerCase());
+                return Object.values(item).join("").toLowerCase().includes(searchValue.toLowerCase());
             });
             hideLoader();
             setFilteredResults(filteredData);
