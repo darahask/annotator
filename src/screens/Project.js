@@ -43,8 +43,9 @@ const Project = (props) => {
             setCreatingProject(true);
             let status = await createProject(props.auth.token, { title, description });
             if (status) {
-                setCreatingProject(true);
-                history.push("/projects");
+                setCreatingProject(false);
+                document.getElementById("createProjectModalClose").click();
+                window.location.reload()
             }
         }
     };

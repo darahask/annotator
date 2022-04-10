@@ -52,8 +52,8 @@ async function deleteAnnotation(token, data) {
     return true
 }
 
-async function trainModel(token, model_name, id) {
-    let response = await axios.post(server + "train-model", {'id': id, 'model_name': model_name}, {
+async function trainModel(token, data) {
+    let response = await axios.post(server + "train-model", data, {
         headers: {
             authtoken: token
         },
@@ -61,8 +61,65 @@ async function trainModel(token, model_name, id) {
         console.log(e)
         return false;
     });
-
-    return response
+    if(response.status === 200)
+        return true
+    return false
 }
 
-export { getDocument, deleteAnnotation, trainModel, getAnnotations, addAnnotations }
+async function getModelPools(token, data) {
+    let response = await axios.post(server + "modelpool-list", data, {
+        headers: {
+            authtoken: token
+        },
+    }).catch(function(e) {
+        console.log(e)
+        return null;
+    });
+    if(response.status === 200)
+        return response.data
+    return null
+}
+
+async function createModelPool(token, data) {
+    let response = await axios.post(server + "create-modelpool", data, {
+        headers: {
+            authtoken: token
+        },
+    }).catch(function(e) {
+        console.log(e)
+        return false;
+    });
+    if(response.status === 200)
+        return true
+    return false
+}
+
+async function saveModelPool(token, data) {
+    let response = await axios.post(server + "change-modelpool-status", data, {
+        headers: {
+            authtoken: token
+        },
+    }).catch(function(e) {
+        console.log(e)
+        return false;
+    });
+    if(response.status === 200)
+        return true
+    return false
+}
+
+async function annotateDocument(token, data) {
+    let response = await axios.post(server + "annotate", data, {
+        headers: {
+            authtoken: token
+        },
+    }).catch(function(e) {
+        console.log(e)
+        return false;
+    });
+    if(response.status === 200)
+        return true
+    return false
+}
+
+export { getDocument, deleteAnnotation, trainModel, getAnnotations, addAnnotations, getModelPools, createModelPool, saveModelPool, annotateDocument }

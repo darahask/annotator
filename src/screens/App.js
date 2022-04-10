@@ -9,6 +9,7 @@ import SearchBar from "../components/Searchbar";
 import Document from "./Document";
 import Project from "./Project";
 import Userprofile from "./Userprofile";
+import Home from "./Home";
 
 //TODO: connect with store to get auth info
 
@@ -72,7 +73,7 @@ const App = (props) => {
                     </Route>
                     
                     <Route path="/">
-                        <h1 style={{ textAlign: "center", marginTop: "10px" }}>Under construction!</h1>
+                        <Home />
                     </Route>
                 </Switch>
             </div>

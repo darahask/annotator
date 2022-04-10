@@ -51,6 +51,13 @@ const Annotationcanvas = ({ data }) => {
                         ctx.drawImage(shape.img, 0, 0);
                     } else {
                         ctx.lineWidth = 2;
+                        if(shape.isAntiPattern) {
+                            ctx.strokeStyle = "red";
+                        } else if(shape.groundTruth) {
+                            ctx.strokeStyle = "green";
+                        } else {
+                            ctx.strokeStyle = "yellow";
+                        }
                         ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
                     }
                 }

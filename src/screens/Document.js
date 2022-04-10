@@ -50,6 +50,7 @@ const Document = (props) => {
                             width: value.bottomX - value.topX,
                             height: value.bottomY - value.topY,
                             isAntiPattern: value.is_antipattern,
+                            groundTruth: value.ground_truth,
                             visible: true,
                             type: "rectangle"
                         };
@@ -107,7 +108,7 @@ const Document = (props) => {
                             </div>
                         </div>
                     </div>
-                    <Managemodel />
+                    <Managemodel projectId={projectId} documentId={documentId}/>
                 </div>
             )}
         </div>

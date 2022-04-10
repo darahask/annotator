@@ -15,10 +15,7 @@ async function fetchAllAnnotationsOfAParticularProject(projectDetails,authToken)
             }
         }
     })
-    console.log("response from all-annotations route");
-    console.log(response);
-
-    return response;
+    return response.data;
 
 }
 
