@@ -1,5 +1,5 @@
 import axios from "axios";
-import { server, socketPath } from "../constants/constant";
+import { server } from "../constants/constant";
 
 async function getDocument(token, data) {
     let response = await axios.post(server + 'document-detail', data, {
